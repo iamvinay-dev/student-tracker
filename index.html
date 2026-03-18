@@ -1,0 +1,1968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#09090f">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Student Tracker</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap');
+:root{--bg:#09090f;--surf:#101018;--card:#161624;--c2:#1c1c2a;--bdr:#2a2a3e;--acc:#7b68ee;--a2:#ff7b5c;--a3:#3dd68c;--a4:#ffd166;--tx:#f0f0f8;--t2:#9090b8;--mu:#555570;--dn:#ff5c5c;--ok:#3dd68c}
+body.light{--bg:#f0f0fa;--surf:#fff;--card:#fff;--c2:#ebebf8;--bdr:#ddddf0;--tx:#0a0a20;--t2:#404060;--mu:#9090b0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:9px}
+
+/* WELCOME */
+#WEL{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px}
+.wb{background:var(--surf);border:1px solid var(--bdr);border-radius:20px;padding:36px 26px;max-width:340px;width:100%;text-align:center}
+.wb-ic{font-size:3.5rem;display:block;margin-bottom:14px}
+.wb h2{font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:800;letter-spacing:-.5px;margin-bottom:8px}
+.wb p{font-size:.85rem;color:var(--mu);margin-bottom:26px;line-height:1.6}
+#WNAME{background:var(--c2);border:2px solid var(--bdr);border-radius:10px;padding:13px 16px;color:var(--tx);font-family:sans-serif;font-size:1rem;font-weight:600;outline:none;width:100%;text-align:center;margin-bottom:14px;transition:border .2s;-webkit-appearance:none;display:block}
+#WNAME:focus{border-color:var(--acc)}
+#WNAME::placeholder{color:var(--mu);font-weight:400}
+#WBTN{background:var(--acc);color:#fff;border:none;border-radius:10px;padding:14px;font-family:sans-serif;font-size:1rem;font-weight:700;cursor:pointer;width:100%;display:block;transition:opacity .2s}
+#WBTN:hover{opacity:.88}
+
+/* APP */
+#APP{display:none;min-height:100vh}
+
+/* SIDEBAR */
+.sb{width:218px;background:var(--surf);border-right:1px solid var(--bdr);position:fixed;top:0;left:0;bottom:0;z-index:100;display:flex;flex-direction:column;transition:transform .25s ease}
+.sb-top{padding:19px 16px 14px;border-bottom:1px solid var(--bdr)}
+.sb-top h1{font-family:'Outfit',sans-serif;font-size:1.12rem;font-weight:800;color:var(--acc);letter-spacing:-.4px;cursor:pointer}
+.sb-top p{font-size:.59rem;color:var(--mu);font-weight:600;letter-spacing:.5px;margin-top:2px;text-transform:uppercase}
+.sb-nav{flex:1;overflow-y:auto;padding:9px 7px}
+.nsec{font-size:.57rem;letter-spacing:2px;color:var(--mu);text-transform:uppercase;padding:10px 9px 4px;font-weight:700}
+.nb{display:flex;align-items:center;gap:8px;padding:10px 11px;border-radius:9px;border:none;background:none;color:var(--mu);font-family:sans-serif;font-size:.81rem;font-weight:600;width:100%;text-align:left;cursor:pointer;margin-bottom:2px;transition:all .15s}
+.nb:hover{background:var(--c2);color:var(--tx)}
+.nb.on{background:rgba(123,104,238,.15);color:var(--acc)}
+.sb-foot{padding:11px 15px;border-top:1px solid var(--bdr);font-size:.62rem;color:var(--mu);font-weight:500}
+
+/* MOBILE BAR */
+.mbar{display:none;position:fixed;top:0;left:0;right:0;height:52px;background:var(--surf);border-bottom:1px solid var(--bdr);z-index:99;align-items:center;padding:0 13px;gap:10px}
+.mbar h1{font-family:'Outfit',sans-serif;font-weight:800;font-size:1rem;color:var(--acc)}
+.mbtn{background:none;border:1px solid var(--bdr);border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--tx);font-size:.95rem}
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:98}
+
+/* MAIN */
+.main{margin-left:218px;flex:1;padding:24px 24px 60px}
+
+/* PAGES */
+.page{display:none}
+.page.on{display:block;animation:pgin .2s ease}
+@keyframes pgin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* TYPE */
+.ph{font-family:'Outfit',sans-serif;font-size:1.55rem;font-weight:800;letter-spacing:-.5px;line-height:1.2;margin-bottom:2px}
+.ps{font-size:.79rem;color:var(--mu);font-weight:500;margin-bottom:20px}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--bdr);border-radius:13px;padding:13px 14px}
+.sv{font-family:'Outfit',sans-serif;font-size:1.5rem;font-weight:800;line-height:1.1;letter-spacing:-.4px}
+.sl{font-size:.6rem;color:var(--mu);margin-top:5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:13px;padding:17px 19px;margin-bottom:13px}
+.ct{font-family:'Outfit',sans-serif;font-weight:700;font-size:.9rem;letter-spacing:-.2px;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;margin-bottom:13px}
+
+/* FORMS */
+.fr{display:flex;gap:9px;margin-bottom:10px;flex-wrap:wrap}
+.fc{flex:1;min-width:90px}
+.lb{font-size:.68rem;color:var(--mu);display:block;margin-bottom:4px;font-weight:700;letter-spacing:.2px}
+input,select,textarea{background:var(--c2);border:1px solid var(--bdr);border-radius:8px;padding:9px 11px;color:var(--tx);font-family:sans-serif;font-size:.82rem;font-weight:500;outline:none;width:100%;transition:border .15s;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--acc)}
+input::placeholder,textarea::placeholder{color:var(--mu)}
+select option{background:var(--c2);color:var(--tx)}
+textarea{resize:vertical;min-height:70px;line-height:1.6}
+
+/* BUTTONS */
+.btn{background:rgba(123,104,238,.14);color:var(--acc);border:1px solid rgba(123,104,238,.28);border-radius:8px;padding:8px 14px;cursor:pointer;font-family:sans-serif;font-size:.81rem;font-weight:700;display:inline-flex;align-items:center;gap:5px;transition:all .15s}
+.btn:hover{background:rgba(123,104,238,.26)}
+.bg{background:rgba(61,214,140,.11);color:var(--a3);border:1px solid rgba(61,214,140,.25)}.bg:hover{background:rgba(61,214,140,.22)}
+.bo{background:rgba(255,123,92,.11);color:var(--a2);border:1px solid rgba(255,123,92,.25)}.bo:hover{background:rgba(255,123,92,.22)}
+.br{background:rgba(255,92,92,.1);color:var(--dn);border:1px solid rgba(255,92,92,.22)}.br:hover{background:rgba(255,92,92,.2)}
+.sm{font-size:.74rem;padding:6px 11px;border-radius:8px}
+.tb{border-radius:99px;padding:5px 13px;font-size:.73rem;cursor:pointer;font-family:sans-serif;font-weight:700;border:1px solid var(--bdr);background:none;color:var(--mu);transition:all .15s}
+.tb.on{border-color:var(--acc);color:var(--acc);background:rgba(123,104,238,.12)}
+.bdg{padding:3px 8px;border-radius:99px;font-size:.62rem;font-weight:700;display:inline-flex;align-items:center}
+.ib{background:rgba(255,92,92,.1);color:var(--dn);border:none;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:.68rem;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+
+/* LIST */
+.dr{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bdr);font-size:.81rem;font-weight:500}
+.dr:last-child{border-bottom:none}
+
+/* ATT */
+.abar{height:4px;background:var(--bdr);border-radius:99px;overflow:hidden;margin-top:5px}
+.afill{height:100%;border-radius:99px;transition:width .4s}
+.sr{background:var(--c2);border:1px solid var(--bdr);border-radius:9px;padding:11px 13px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px}
+.pb{border:none;border-radius:8px;padding:6px 10px;cursor:pointer;font-weight:700;font-size:.71rem;font-family:sans-serif;transition:all .15s}
+.pp{background:rgba(61,214,140,.1);color:var(--ok)}.pp.on,.pp:hover{background:var(--ok);color:#071a0f}
+.pa{background:rgba(255,92,92,.1);color:var(--dn)}.pa.on,.pa:hover{background:var(--dn);color:#fff}
+.ph2{background:rgba(255,209,102,.1);color:var(--a4)}.ph2.on,.ph2:hover{background:var(--a4);color:#1a1200}
+.chip{padding:3px 7px;border-radius:6px;font-size:.63rem;font-weight:700;border:1px solid;display:inline-block;margin:2px}
+
+/* EXPENSE */
+.txr{background:var(--c2);border:1px solid var(--bdr);border-radius:9px;padding:10px 12px;display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.txic{width:33px;height:33px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
+.brs{display:flex;align-items:flex-end;gap:4px;height:82px}
+.bc{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bb{width:100%;border-radius:4px 4px 0 0;min-height:2px;transition:height .4s}
+
+/* TODO */
+.tor{background:var(--c2);border:1px solid var(--bdr);border-radius:9px;padding:11px 13px;display:flex;gap:9px;margin-bottom:7px;align-items:flex-start}
+.chk{width:19px;height:19px;border-radius:5px;border:2px solid var(--bdr);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;transition:all .15s}
+.chk.done{background:var(--acc);border-color:var(--acc)}
+
+/* PLANNER */
+.pday{font-family:'Outfit',sans-serif;font-size:1.9rem;font-weight:800;line-height:1;letter-spacing:-.6px}
+.pblk{background:var(--c2);border-left:3px solid var(--acc);border-radius:0 9px 9px 0;padding:9px 12px;margin-bottom:7px;position:relative}
+.ptm{font-size:.66rem;color:var(--acc);font-weight:700;margin-bottom:3px;letter-spacing:.3px}
+
+/* CALENDAR */
+.calhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.caltitle{font-family:'Outfit',sans-serif;font-weight:700;font-size:.9rem}
+.calnav{background:var(--c2);border:1px solid var(--bdr);border-radius:8px;width:30px;height:30px;cursor:pointer;color:var(--tx);font-size:.85rem;display:flex;align-items:center;justify-content:center;font-weight:700}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.caldl{font-size:.58rem;font-weight:700;color:var(--mu);text-align:center;padding:4px 0;text-transform:uppercase}
+.cday{height:33px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid transparent}
+.cday:hover{border-color:var(--acc)}
+.cday.empty,.cday.fut{cursor:default}.cday.fut{opacity:.3}
+.cday.tod{border-color:var(--acc)!important;color:var(--acc);font-weight:800}
+.cday.pres{background:rgba(61,214,140,.2);color:#3dd68c}
+.cday.abs{background:rgba(255,92,92,.2);color:#ff5c5c}
+.cday.hol{background:rgba(255,209,102,.2);color:#ffd166}
+.calleg{display:flex;gap:13px;margin-top:9px;flex-wrap:wrap}
+.clitem{display:flex;align-items:center;gap:5px;font-size:.67rem;font-weight:600;color:var(--mu)}
+.cldot{width:9px;height:9px;border-radius:3px}
+
+/* DOCS */
+.dz{border:2px dashed var(--bdr);border-radius:13px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--c2)}
+.dz:hover,.dz.dg{border-color:var(--acc);background:rgba(123,104,238,.05)}
+.fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:9px;margin-top:11px}
+.fc2{background:var(--c2);border:1px solid var(--bdr);border-radius:9px;padding:11px 9px;cursor:pointer;transition:all .2s;text-align:center}
+.fc2:hover{border-color:var(--acc);transform:translateY(-2px)}
+.pi{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px}
+.pi img{height:88px;width:auto;border-radius:5px;border:1px solid var(--bdr);flex-shrink:0}
+#VB canvas{max-width:100%;border-radius:6px;border:1px solid var(--bdr);margin-bottom:8px;display:block}
+#VB pre{font-family:'Courier New',monospace;font-size:.77rem;color:var(--t2);white-space:pre-wrap;max-height:480px;overflow-y:auto;background:var(--c2);padding:13px;border-radius:9px;border:1px solid var(--bdr);line-height:1.6}
+
+/* SETTINGS */
+.srow{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid var(--bdr)}
+.srow:last-child{border-bottom:none}
+.slbl{font-weight:600;font-size:.88rem}
+.ssub{font-size:.73rem;color:var(--mu);font-weight:500;margin-top:2px}
+.tog{position:relative;width:48px;height:26px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.togtr{position:absolute;inset:0;background:var(--bdr);border-radius:99px;cursor:pointer;transition:background .2s}
+.tog input:checked+.togtr{background:var(--acc)}
+.togth{position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s;pointer-events:none}
+.tog input:checked~.togth{transform:translateX(22px)}
+
+/* TOAST */
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--acc);color:#fff;padding:10px 20px;border-radius:99px;font-size:.82rem;font-weight:700;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
+#toast.show{opacity:1}
+@media(max-width:760px){
+  .sb{transform:translateX(-100%)}.sb.open{transform:translateX(0)}
+  .main{margin-left:0;padding:13px;padding-top:66px}
+  .mbar{display:flex}.ov.show{display:block}
+  .stats{grid-template-columns:1fr 1fr}.g2,.g3{grid-template-columns:1fr}
+}
+
+
+
+#RPT_OV{position:fixed;inset:0;z-index:9999;display:none;flex-direction:column;background:#f0f4ff}
+#RPT_OV.open{display:flex}
+#RPT_OV_BAR{background:#1a237e;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+#RPT_OV_TITLE{font-weight:700;font-size:.85rem;color:#e0e8ff;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#RPT_OV_BODY{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px}
+#RPT_PRINT_BTN_ROW{background:#fff8e1;border-bottom:2px solid #ffd166;padding:10px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+#RPT_PRINT_BTN_ROW span{font-size:.78rem;color:#666;flex:1;line-height:1.4}
+.rpt-cls{background:#e74c3c;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:.9rem;font-weight:800;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.rpt-print{background:#ff7b5c;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:.85rem;font-weight:700;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- WELCOME -->
+<div id="WEL">
+  <div class="wb">
+    <span class="wb-ic">🎓</span>
+    <h2>Welcome!</h2>
+    <p>Your personal academic companion.<br>What should we call you?</p>
+    <input id="WNAME" type="text" placeholder="Enter your name..." maxlength="30" autocomplete="off">
+    <button id="WBTN">Get Started →</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="APP">
+  <div class="ov" id="OV"></div>
+  <div class="mbar" id="MB">
+    <button class="mbtn" id="MMB">☰</button>
+    <h1 id="MTITLE">Student Tracker</h1>
+  </div>
+  <nav class="sb" id="SB">
+    <div class="sb-top">
+      <h1 id="APPTITLE">Student Tracker</h1>
+      <p>Personal Academic Suite</p>
+    </div>
+    <div class="sb-nav">
+      <div class="nsec">Overview</div>
+      <button class="nb on" data-p="dashboard">⊞ &nbsp;Dashboard</button>
+      <button class="nb" data-p="planner">📅 &nbsp;Daily Planner</button>
+      <div class="nsec">Academic</div>
+      <button class="nb" data-p="attendance">✓ &nbsp;Attendance</button>
+      <button class="nb" data-p="expenses">₹ &nbsp;Money Tracker</button>
+      <button class="nb" data-p="todo">☑ &nbsp;To-Do List</button>
+      <div class="nsec">More</div>
+      <button class="nb" data-p="settings">⚙️ &nbsp;Settings</button>
+    </div>
+    <div class="sb-foot" id="NF"></div>
+  </nav>
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page on" id="page-dashboard">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:3px">
+        <div class="ph" id="UNAME" style="font-size:2rem"></div>
+        <div id="CLOCK" style="background:var(--card);border:1px solid var(--bdr);border-radius:9px;padding:7px 14px;font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:800;color:var(--acc);letter-spacing:-.2px;flex-shrink:0">--:-- --</div>
+      </div>
+      <div class="ps" id="DDATE"></div>
+      <div class="stats">
+        <div class="stat"><div class="sv" style="color:var(--acc)" id="dA">—</div><div class="sl">Attendance</div></div>
+        <div class="stat"><div class="sv" style="color:var(--a3)" id="dB">₹0</div><div class="sl">Balance</div></div>
+        <div class="stat"><div class="sv" style="color:var(--a2)" id="dP">0</div><div class="sl">Pending</div></div>
+        <div class="stat"><div class="sv" style="color:var(--a4)" id="dS">₹0</div><div class="sl">Spent Today</div></div>
+      </div>
+      <div class="g2">
+        <div class="card"><div class="ct"><span class="dot" style="background:var(--acc)"></span>Today's Attendance</div><div id="dAL"><p style="color:var(--mu);font-size:.81rem">No subjects yet.</p></div><button class="btn sm" style="margin-top:10px" id="btnGoAtt">Mark Today →</button></div>
+        <div class="card"><div class="ct"><span class="dot" style="background:var(--a2)"></span>Upcoming Tasks</div><div id="dTL"><p style="color:var(--mu);font-size:.81rem">No upcoming tasks.</p></div><button class="btn bo sm" style="margin-top:10px" id="btnGoTodo">View Tasks →</button></div>
+        <div class="card"><div class="ct"><span class="dot" style="background:var(--dn)"></span>Low Attendance</div><div id="dLL"><p style="color:var(--ok);font-size:.81rem;font-weight:600">✓ All subjects on track!</p></div></div>
+        <div class="card"><div class="ct"><span class="dot" style="background:var(--a3)"></span>Today's Expenses</div><div id="dML"><p style="color:var(--mu);font-size:.81rem">Nothing logged today.</p></div><button class="btn bg sm" style="margin-top:10px" id="btnGoExp">Log Expense →</button></div>
+      </div>
+      <div class="card"><div class="ct"><span class="dot" style="background:var(--a4)"></span>Tomorrow's Plan</div><div id="dTP"><p style="color:var(--mu);font-size:.81rem">No plans yet.</p></div><button class="btn sm" style="margin-top:10px" id="btnGoPlan">Plan Tomorrow →</button></div>
+    </div>
+
+    <!-- PLANNER -->
+    <div class="page" id="page-planner">
+      <div class="ph">Daily Planner</div><div class="ps">Plan today and tomorrow — stay ahead every day</div>
+      <div class="g2">
+        <div class="card" style="border-left:3px solid var(--acc)">
+          <div class="pday" style="color:var(--acc)" id="PTD"></div>
+          <div style="font-size:.73rem;color:var(--mu);font-weight:500;margin-bottom:13px" id="PTDD"></div>
+          <div class="ct"><span class="dot" style="background:var(--acc)"></span>Today</div>
+          <div id="todayP"></div>
+          <div class="fr" style="margin-top:11px">
+            <div class="fc"><label class="lb">Time</label><input type="time" id="PLT" value="08:00"></div>
+            <div class="fc" style="flex:2"><label class="lb">Task</label><input type="text" id="PLK" placeholder="e.g. Attend lecture"></div>
+          </div>
+          <button class="btn sm" id="btnAddPlanToday">＋ Add</button>
+        </div>
+        <div class="card" style="border-left:3px solid var(--a2)">
+          <div class="pday" style="color:var(--a2)" id="PTMD"></div>
+          <div style="font-size:.73rem;color:var(--mu);font-weight:500;margin-bottom:13px" id="PTMDD"></div>
+          <div class="ct"><span class="dot" style="background:var(--a2)"></span>Tomorrow</div>
+          <div id="tomP"></div>
+          <div class="fr" style="margin-top:11px">
+            <div class="fc"><label class="lb">Time</label><input type="time" id="PLTT" value="08:00"></div>
+            <div class="fc" style="flex:2"><label class="lb">Task</label><input type="text" id="PLTK" placeholder="e.g. Submit assignment"></div>
+          </div>
+          <button class="btn bo sm" id="btnAddPlanTom">＋ Add</button>
+        </div>
+      </div>
+      <div class="card"><div class="ct"><span class="dot" style="background:var(--a4)"></span>Quick Notes</div><textarea id="QN" placeholder="Write anything here..."></textarea></div>
+    </div>
+
+    <!-- ATTENDANCE -->
+    <div class="page" id="page-attendance">
+      <div class="ph">Attendance Tracker</div>
+      <div class="ps">P = Present · A = Absent · H = Holiday</div>
+      <div class="stats">
+        <div class="stat"><div class="sv" style="color:var(--acc)" id="aO">—</div><div class="sl">Overall %</div></div>
+        <div class="stat"><div class="sv" style="color:var(--a3)" id="aN2">0</div><div class="sl">Subjects</div></div>
+        <div class="stat"><div class="sv" style="color:var(--ok)" id="aSF">0</div><div class="sl">Safe ≥75%</div></div>
+        <div class="stat"><div class="sv" style="color:var(--a2)" id="aRK">0</div><div class="sl">Risky &lt;75%</div></div>
+      </div>
+
+      <!-- TAB SWITCHER -->
+      <div style="display:flex;gap:6px;margin-bottom:13px;flex-wrap:wrap">
+        <button class="tb on" id="at0">📋 Mark</button>
+        <button class="tb" id="at1">📅 Calendar</button>
+        <button class="tb" id="at2">📊 Stats</button>
+        <button class="tb" id="at3">✏️ Manage Subjects</button>
+      </div>
+
+      <!-- MARK PANEL -->
+      <div id="AMS">
+        <div class="card">
+          <div class="ct"><span class="dot" style="background:var(--acc)"></span>Select Date</div>
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:9px">
+            <button class="btn sm" id="btnAttPrev" style="padding:7px 11px;font-size:1rem">‹</button>
+            <input type="date" id="AD" style="flex:1;text-align:center">
+            <button class="btn sm" id="btnAttNext" style="padding:7px 11px;font-size:1rem">›</button>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="tb" id="btnAttYest">Yesterday</button>
+            <button class="tb on" id="btnAttToday">Today</button>
+          </div>
+          <div id="ADN" style="font-size:.74rem;font-weight:600;margin-top:8px"></div>
+        </div>
+        <div class="card">
+          <div class="ct"><span class="dot" style="background:var(--a2)"></span><span id="AML">Mark for Today</span></div>
+          <div id="SL"><p style="color:var(--mu);font-size:.81rem;text-align:center;padding:15px">No subjects yet. Go to Manage Subjects tab to add.</p></div>
+        </div>
+      </div>
+
+      <!-- CALENDAR PANEL -->
+      <div id="AHS" style="display:none">
+        <div class="card">
+          <div class="ct"><span class="dot" style="background:var(--a4)"></span>Attendance Calendar</div>
+          <div style="margin-bottom:11px"><label class="lb">Subject</label><select id="CAL_SUB"></select></div>
+          <div id="CAL_WRAP"></div>
+          <div class="calleg">
+            <div class="clitem"><div class="cldot" style="background:rgba(61,214,140,.3);border:1px solid #3dd68c"></div>Present</div>
+            <div class="clitem"><div class="cldot" style="background:rgba(255,92,92,.3);border:1px solid #ff5c5c"></div>Absent</div>
+            <div class="clitem"><div class="cldot" style="background:rgba(255,209,102,.3);border:1px solid #ffd166"></div>Holiday</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS PANEL -->
+      <div id="ASS" style="display:none">
+        <div class="card">
+          <div class="ct"><span class="dot" style="background:var(--acc)"></span>Subject Stats</div>
+          <div id="SSL"></div>
+        </div>
+      </div>
+
+      <!-- MANAGE SUBJECTS PANEL -->
+      <div id="AMS2" style="display:none">
+        <div class="card">
+          <div class="ct"><span class="dot" style="background:var(--a3)"></span>Add New Subject</div>
+          <div class="fr"><div class="fc"><label class="lb">Subject Name</label><input type="text" id="AN" placeholder="e.g. Mathematics, Physics..."></div></div>
+          <button class="btn bg" id="btnAddSubj">＋ Add Subject</button>
+        </div>
+        <div class="card">
+          <div class="ct"><span class="dot" style="background:var(--acc)"></span>My Subjects <span style="font-size:.72rem;color:var(--mu);font-weight:500;margin-left:4px">(tap name to rename · ✕ to delete)</span></div>
+          <div id="SUBJ_MANAGE"><p style="color:var(--mu);font-size:.81rem;text-align:center;padding:14px">No subjects yet.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPENSES -->
+    <div class="page" id="page-expenses">
+      <div class="ph">Money Tracker</div><div class="ps">Track every ₹ — today or fix yesterday</div>
+      <div class="stats">
+        <div class="stat"><div class="sv" style="color:var(--a3)" id="eI">₹0</div><div class="sl">Income</div></div>
+        <div class="stat"><div class="sv" style="color:var(--a2)" id="eX">₹0</div><div class="sl">Spent</div></div>
+        <div class="stat"><div class="sv" style="color:var(--acc)" id="eB">₹0</div><div class="sl">Balance</div></div>
+        <div class="stat"><div class="sv" style="color:var(--a4)" id="eT">₹0</div><div class="sl">Today</div></div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="ct"><span class="dot" style="background:var(--a3)"></span>Add Transaction</div>
+          <div class="fr"><div class="fc"><label class="lb">Description</label><input type="text" id="ED" placeholder="e.g. Canteen lunch"></div><div class="fc"><label class="lb">Amount (₹)</label><input type="number" id="EA" placeholder="0" min="0"></div></div>
+          <div class="fr"><div class="fc"><label class="lb">Type</label><select id="ET"><option value="expense">💸 Expense</option><option value="income">💰 Income</option></select></div><div class="fc"><label class="lb">Category</label><select id="EC"><option>🍕 Food</option><option>📚 Books</option><option>🚌 Transport</option><option>🎮 Fun</option><option>👕 Clothes</option><option>💊 Health</option><option>🏠 Rent</option><option>💰 Allowance</option><option>📦 Other</option></select></div></div>
+          <div class="fr">
+            <div class="fc">
+              <label class="lb">Date</label>
+              <div style="display:flex;align-items:center;gap:6px">
+                <button class="btn sm" id="btnExpPrev" style="padding:7px 10px;font-size:1rem;flex-shrink:0">‹</button>
+                <input type="date" id="EDt" style="flex:1;text-align:center">
+                <button class="btn sm" id="btnExpNext" style="padding:7px 10px;font-size:1rem;flex-shrink:0">›</button>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+            <button class="tb" id="btnExpYest">Yesterday</button>
+            <button class="tb on" id="btnExpToday">Today</button>
+          </div>
+          <button class="btn bg" id="btnAddTxn">＋ Add Transaction</button>
+        </div>
+        <div class="card"><div class="ct"><span class="dot" style="background:var(--a4)"></span>7-Day Spending</div><div class="brs" id="EC2"></div></div>
+      </div>
+      <div class="g3">
+        <div class="card" style="margin-bottom:0"><div class="ct" style="margin-bottom:5px"><span class="dot" style="background:var(--a4)"></span>Today</div><div class="sv" style="color:var(--a4);font-size:1.2rem" id="ePT">₹0</div></div>
+        <div class="card" style="margin-bottom:0"><div class="ct" style="margin-bottom:5px"><span class="dot" style="background:var(--a2)"></span>This Week</div><div class="sv" style="color:var(--a2);font-size:1.2rem" id="ePW">₹0</div></div>
+        <div class="card" style="margin-bottom:0"><div class="ct" style="margin-bottom:5px"><span class="dot" style="background:var(--acc)"></span>This Month</div><div class="sv" style="color:var(--acc);font-size:1.2rem" id="ePM">₹0</div></div>
+      </div>
+      <div style="height:13px"></div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="tb on" id="et0">📅 Daily</button>
+        <button class="tb" id="et1">📋 All</button>
+        <button class="tb" id="et2">📊 Category</button>
+      </div>
+      <div id="EP0" class="card">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:9px">
+          <button class="btn sm" id="btnViewPrev" style="padding:7px 10px;font-size:1rem">‹</button>
+          <input type="date" id="EVD" style="flex:1;text-align:center">
+          <button class="btn sm" id="btnViewNext" style="padding:7px 10px;font-size:1rem">›</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+          <button class="tb" id="btnViewYest">Yesterday</button>
+          <button class="tb on" id="btnViewToday">Today</button>
+        </div>
+        <div id="EDS" style="font-size:.77rem;font-weight:600;margin-bottom:10px"></div>
+        <div id="EDL"></div>
+      </div>
+      <div id="EP1" class="card" style="display:none"><div class="ct"><span class="dot" style="background:var(--a2)"></span>All Transactions</div><div id="EAL"></div></div>
+      <div id="EP2" class="card" style="display:none"><div class="ct"><span class="dot" style="background:var(--acc)"></span>Category Breakdown</div><div id="ECL"></div></div>
+    </div>
+
+    <!-- TODO -->
+    <div class="page" id="page-todo">
+      <div class="ph">To-Do List</div>
+      <div id="TDH" style="font-size:.87rem;font-weight:700;color:var(--acc);margin-bottom:4px"></div>
+      <div class="ps">Plan assignments, exams and tasks</div>
+      <div class="stats">
+        <div class="stat"><div class="sv" style="color:var(--acc)" id="tTo">0</div><div class="sl">Total</div></div>
+        <div class="stat"><div class="sv" style="color:var(--a2)" id="tPe">0</div><div class="sl">Pending</div></div>
+        <div class="stat"><div class="sv" style="color:var(--ok)" id="tDo">0</div><div class="sl">Done</div></div>
+        <div class="stat"><div class="sv" style="color:var(--a4)" id="tTd">0</div><div class="sl">Due Today</div></div>
+      </div>
+      <div class="card">
+        <div class="ct"><span class="dot" style="background:var(--a3)"></span>New Task</div>
+        <div class="fr">
+          <div class="fc" style="flex:2"><label class="lb">Title</label><input type="text" id="TT" placeholder="e.g. Submit lab report"></div>
+          <div class="fc"><label class="lb">Priority</label><select id="TP"><option value="high">🔴 High</option><option value="med" selected>🟡 Medium</option><option value="low">🟢 Low</option></select></div>
+        </div>
+        <div class="fr">
+          <div class="fc"><label class="lb">Category</label><select id="TC"><option>Assignment</option><option>Exam</option><option>Project</option><option>Lab</option><option>Reading</option><option>Personal</option><option>Other</option></select></div>
+          <div class="fc"><label class="lb">Subject</label><input type="text" id="TS" placeholder="e.g. Math"></div>
+        </div>
+        <div style="margin-bottom:11px">
+          <label class="lb">Due Date</label>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <div style="flex:1">
+              <div style="font-size:.65rem;color:var(--mu);font-weight:700;margin-bottom:3px">DAY</div>
+              <select id="TD_D" style="padding:10px 8px;font-size:.9rem;font-weight:600;text-align:center;width:100%"></select>
+            </div>
+            <div style="flex:2">
+              <div style="font-size:.65rem;color:var(--mu);font-weight:700;margin-bottom:3px">MONTH</div>
+              <select id="TD_M" style="padding:10px 8px;font-size:.9rem;font-weight:600;width:100%">
+                <option value="">— Month —</option>
+                <option value="01">January</option><option value="02">February</option>
+                <option value="03">March</option><option value="04">April</option>
+                <option value="05">May</option><option value="06">June</option>
+                <option value="07">July</option><option value="08">August</option>
+                <option value="09">September</option><option value="10">October</option>
+                <option value="11">November</option><option value="12">December</option>
+              </select>
+            </div>
+            <div style="flex:1.2">
+              <div style="font-size:.65rem;color:var(--mu);font-weight:700;margin-bottom:3px">YEAR</div>
+              <select id="TD_Y" style="padding:10px 8px;font-size:.9rem;font-weight:600;text-align:center;width:100%"></select>
+            </div>
+          </div>
+        </div>
+        <button class="btn bg" id="btnAddTodo">＋ Add Task</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="tb on" id="tf0">All</button>
+        <button class="tb" id="tf1">Pending</button>
+        <button class="tb" id="tf2">Done</button>
+        <button class="tb" id="tf3">🔴 High</button>
+        <button class="tb" id="tf4">Due Today</button>
+      </div>
+      <div class="card"><div id="TL"></div></div>
+    </div>
+
+
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="ph">Settings</div><div class="ps">Personalise your Student Tracker</div>
+
+      <!-- PROFILE - TOP -->
+      <div class="card" style="border:1px solid rgba(61,214,140,.3)">
+        <div class="ct"><span class="dot" style="background:var(--a3)"></span>👤 Profile</div>
+        <div style="display:flex;align-items:center;gap:14px;padding:6px 0">
+          <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--acc),#a06af7);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0">👤</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:800;letter-spacing:-.3px" id="SET_NAME_BIG">—</div>
+            <div style="font-size:.72rem;color:var(--mu);font-weight:500;margin-top:2px" id="SET_ROLE">Student</div>
+          </div>
+          <button class="btn sm" id="btnChangeName">✏️ Edit Name</button>
+        </div>
+        <!-- Inline name editor (replaces prompt - works on Android WebView) -->
+        <div id="NAME_EDIT_ROW" style="display:none;margin-top:12px;display:none">
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="NAME_INPUT" placeholder="Enter new name..." maxlength="30" style="flex:1">
+            <button class="btn bg sm" id="btnSaveName">✓ Save</button>
+            <button class="btn br sm" id="btnCancelName">✕</button>
+          </div>
+        </div>
+        <div style="display:none"><div id="SET_NAME">—</div></div>
+      </div>
+
+      <!-- YOUR REPORTS - saved PDFs -->
+      <div class="card">
+        <div class="ct"><span class="dot" style="background:var(--a2)"></span>📁 Your Reports</div>
+        <div style="font-size:.76rem;color:var(--mu);margin-bottom:12px">All PDF reports you've generated are listed here</div>
+        <div id="SAVED_REPORTS">
+          <div style="text-align:center;padding:18px;color:var(--mu)">
+            <div style="font-size:2rem;margin-bottom:8px">📄</div>
+            <div style="font-size:.8rem;font-weight:500">No reports yet.<br>Generate one below and it will appear here.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOWNLOAD REPORTS -->
+      <div class="card" style="border:1px solid rgba(255,123,92,.4)">
+        <div class="ct"><span class="dot" style="background:var(--a2)"></span>💰 Generate Expenses Report</div>
+        <div style="font-size:.76rem;color:var(--mu);margin-bottom:14px">Income &amp; expenses summary as a PDF</div>
+
+        <label class="lb">Time Range</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:13px">
+          <button class="tb on" id="rpt7">7 Days</button>
+          <button class="tb" id="rpt30">1 Month</button>
+          <button class="tb" id="rpt90">3 Months</button>
+          <button class="tb" id="rptCustom">Custom</button>
+        </div>
+
+        <div id="RPT_CUSTOM" style="display:none;margin-bottom:13px">
+          <div class="fr">
+            <div class="fc"><label class="lb">From Date</label><input type="date" id="RPT_FROM"></div>
+            <div class="fc"><label class="lb">To Date</label><input type="date" id="RPT_TO"></div>
+          </div>
+        </div>
+
+        <div style="background:var(--c2);border:1px solid var(--bdr);border-radius:9px;padding:10px 12px;margin-bottom:13px;font-size:.8rem;color:var(--a2);font-weight:600" id="RPT_PREVIEW">
+          📅 Last 7 days
+        </div>
+
+        <button class="btn bo" id="btnDlReport" style="width:100%;justify-content:center;padding:12px;font-size:.9rem;border-radius:10px">⬇ Generate &amp; Download PDF</button>
+      </div>
+
+      <!-- ATTENDANCE REPORT -->
+      <div class="card" style="border:1px solid rgba(123,104,238,.4)">
+        <div class="ct"><span class="dot" style="background:var(--acc)"></span>📊 Generate Attendance Report</div>
+        <div style="font-size:.76rem;color:var(--mu);margin-bottom:14px">Subject-wise attendance summary as a PDF</div>
+        <label class="lb">Time Range</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:13px">
+          <button class="tb on" id="arpt7">7 Days</button>
+          <button class="tb" id="arpt30">1 Month</button>
+          <button class="tb" id="arpt90">3 Months</button>
+          <button class="tb" id="arptCustom">Custom</button>
+        </div>
+        <div id="ATT_RPT_CUSTOM" style="display:none;margin-bottom:13px">
+          <div class="fr">
+            <div class="fc"><label class="lb">From Date</label><input type="date" id="ATT_RPT_FROM"></div>
+            <div class="fc"><label class="lb">To Date</label><input type="date" id="ATT_RPT_TO"></div>
+          </div>
+        </div>
+        <div style="background:var(--c2);border:1px solid var(--bdr);border-radius:9px;padding:10px 12px;margin-bottom:13px;font-size:.8rem;color:var(--acc);font-weight:600" id="ATT_RPT_PREVIEW">
+          📅 Last 7 days
+        </div>
+        <button class="btn" id="btnDlAttReport" style="width:100%;justify-content:center;padding:12px;font-size:.9rem;border-radius:10px">📊 Generate Attendance PDF</button>
+      </div>
+
+      <!-- APPEARANCE -->
+      <div class="card">
+        <div class="ct"><span class="dot" style="background:var(--a4)"></span>🎨 Appearance</div>
+        <div class="srow">
+          <div><div class="slbl">Dark Mode</div><div class="ssub">Switch between dark and light theme</div></div>
+          <label class="tog"><input type="checkbox" id="TGTOG"><div class="togtr"></div><div class="togth"></div></label>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="card">
+        <div class="ct"><span class="dot" style="background:var(--a2)"></span>📊 Your Stats</div>
+        <div class="srow"><div><div class="slbl">Total Transactions</div></div><div id="SET_TXN" style="font-weight:700;color:var(--a2)">0</div></div>
+        <div class="srow"><div><div class="slbl">Total Tasks</div></div><div id="SET_TODO" style="font-weight:700;color:var(--acc)">0</div></div>
+        <div class="srow"><div><div class="slbl">Attendance Records</div></div><div id="SET_ATT" style="font-weight:700;color:var(--a3)">0</div></div>
+      </div>
+
+      <!-- SUBJECTS -->
+      <div class="card">
+        <div class="ct"><span class="dot" style="background:var(--acc)"></span>📚 Subjects</div>
+        <div class="srow"><div><div class="slbl">Manage Subjects</div><div class="ssub" id="SET_SUBJ_COUNT">0 subjects added</div></div><button class="btn bg sm" id="btnGoSubjects">✏️ Manage</button></div>
+      </div>
+
+      <!-- DATA -->
+      <div class="card">
+        <div class="ct"><span class="dot" style="background:var(--dn)"></span>⚠️ Data</div>
+        <div class="srow"><div><div class="slbl">Clear All Data</div><div class="ssub">Permanently delete all subjects, expenses, tasks</div></div><button class="btn br sm" id="btnClearData">🗑 Clear</button></div>
+        <div class="srow"><div><div class="slbl">Clear Saved Reports</div><div class="ssub">Remove all reports from Your Reports list</div></div><button class="btn br sm" id="btnClearReports">🗑 Clear</button></div>
+      </div>
+
+      <div style="text-align:center;padding:20px 0;font-size:.72rem;color:var(--mu)">
+        Student Tracker · Built for students · Data stored on your device
+      </div>
+    </div>
+
+  </main>
+</div><!-- #APP -->
+
+<script>
+
+/* ─── HELPERS ─── */
+/* ─── DATE (dynamic - recalculated every time) ─── */
+function showToast(msg,dur){
+  var t=ge('toast'); if(!t){return;}
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(function(){t.classList.remove('show');},dur||2500);
+}
+
+function getToday(){
+  var d=new Date();
+  var y=d.getFullYear();
+  var m=String(d.getMonth()+1).padStart(2,'0');
+  var day=String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+day;
+}
+function getYest(){
+  var d=new Date(); d.setDate(d.getDate()-1);
+  var y=d.getFullYear();
+  var m=String(d.getMonth()+1).padStart(2,'0');
+  var day=String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+day;
+}
+var TODAY=getToday();
+var YEST=getYest();
+
+/* Refresh date whenever app comes back into focus */
+function refreshDate(){
+  TODAY=getToday();
+  YEST=getYest();
+  var dd=ge('DDATE');if(dd){dd.textContent=ld(TODAY);}
+  var nf=ge('NF');if(nf){nf.textContent=ld(TODAY);}
+  var tdh=ge('TDH');if(tdh){var now=new Date();tdh.textContent='Today — '+DAYS[now.getDay()]+', '+now.getDate()+' '+MNS[now.getMonth()];}
+  /* Always reset date inputs to today when date changes */
+  var adt=ge('AD');if(adt&&adt.value<TODAY){adt.value=TODAY;}
+  var edt=ge('EDt');if(edt){edt.value=TODAY;}
+  var evd=ge('EVD');if(evd&&evd.value<YEST){evd.value=TODAY;}
+}
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='visible'){refreshDate();}
+});
+window.addEventListener('focus',function(){refreshDate();});
+window.addEventListener('pageshow',function(){refreshDate();});
+/* Also refresh every 30 seconds while open */
+setInterval(function(){refreshDate();},30000);
+var DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+var MNS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+var CC={'🍕 Food':'#ff7b5c','📚 Books':'#7b68ee','🚌 Transport':'#3dd68c','🎮 Fun':'#ffd166','👕 Clothes':'#ff5c5c','💊 Health':'#3dd68c','🏠 Rent':'#a06af7','💰 Allowance':'#5cb8ff','📦 Other':'#9090b0'};
+
+function ge(id){return document.getElementById(id);}
+function fR(n){return '₹'+Number(n).toLocaleString('en-IN');}
+function gt(){var d=new Date();d.setDate(d.getDate()+1);var y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+day;}
+function ld(ds){var d=new Date(ds+'T12:00:00');return DAYS[d.getDay()]+', '+d.getDate()+' '+MNS[d.getMonth()]+' '+d.getFullYear();}
+function es(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmtDate(ds){
+  if(!ds){return '';}
+  var d=new Date(ds+'T12:00:00');
+  return d.getDate()+' '+MNS[d.getMonth()]+' '+d.getFullYear();
+}
+
+/* ─── STATE ─── */
+var STORE_KEY='studenttracker_v1';
+var D={subjects:[],txns:[],todos:[],plans:{},notes:'',title:'Student Tracker',theme:'dark',name:'',savedReports:[]};
+function loadD(){
+  try{
+    var s=localStorage.getItem(STORE_KEY);
+    if(s){
+      var parsed=JSON.parse(s);
+      // Only load if it looks like our data
+      if(parsed&&typeof parsed==='object'){
+        D=parsed;
+      }
+    }
+  }catch(e){console.warn('loadD failed',e);}
+  // Always ensure all required fields exist
+  if(!Array.isArray(D.subjects)){D.subjects=[];}
+  if(!Array.isArray(D.txns)){D.txns=[];}
+  if(!Array.isArray(D.todos)){D.todos=[];}
+  if(!D.plans||typeof D.plans!=='object'){D.plans={};}
+  if(typeof D.notes!=='string'){D.notes='';}
+  if(!D.title){D.title='Student Tracker';}
+  if(!D.theme){D.theme='dark';}
+  if(!Array.isArray(D.savedReports)){D.savedReports=[];}
+}
+function saveD(){
+  var reports=D.savedReports||[];
+  // Save only metadata for reports (PDF binary is too large for localStorage)
+  var meta=reports.map(function(r){return{name:r.name,type:r.type,range:r.range,date:r.date};});
+  var toSave={
+    subjects:D.subjects,
+    txns:D.txns,
+    todos:D.todos,
+    plans:D.plans,
+    notes:D.notes,
+    title:D.title,
+    theme:D.theme,
+    name:D.name,
+    savedReports:meta
+  };
+  try{
+    localStorage.setItem(STORE_KEY,JSON.stringify(toSave));
+  }catch(e){
+    console.warn('saveD failed - trying without plans',e);
+    try{
+      toSave.plans={};
+      localStorage.setItem(STORE_KEY,JSON.stringify(toSave));
+    }catch(e2){console.warn('saveD completely failed',e2);}
+  }
+  // Always keep full in-memory reports (with PDF data) intact
+  D.savedReports=reports;
+}
+loadD();
+
+/* ─── WELCOME ─── */
+function startApp(){
+  var n=ge('WNAME').value.trim();
+  if(!n){ge('WNAME').style.borderColor='#ff5c5c';ge('WNAME').focus();return;}
+  ge('WNAME').style.borderColor='';
+  D.name=n; saveD();
+  ge('WEL').style.display='none';
+  ge('APP').style.display='block';
+  initAll();
+}
+ge('WBTN').addEventListener('click',startApp);
+ge('WNAME').addEventListener('keydown',function(e){if(e.key==='Enter'){startApp();}});
+
+/* ─── INIT ─── */
+function initAll(){
+  var now=new Date();
+  ge('UNAME').textContent=D.name+'!';
+  ge('DDATE').textContent=ld(TODAY);
+  ge('NF').textContent=ld(TODAY);
+  var tom=new Date();tom.setDate(tom.getDate()+1);
+  ge('PTD').textContent=DAYS[now.getDay()];
+  ge('PTDD').textContent=now.getDate()+' '+MNS[now.getMonth()]+' '+now.getFullYear();
+  ge('PTMD').textContent=DAYS[tom.getDay()];
+  ge('PTMDD').textContent=tom.getDate()+' '+MNS[tom.getMonth()]+' '+tom.getFullYear();
+  ge('TDH').textContent='Today — '+DAYS[now.getDay()]+', '+now.getDate()+' '+MNS[now.getMonth()];
+  ge('APPTITLE').textContent=D.title||'Student Tracker';
+  ge('MTITLE').textContent=D.title||'Student Tracker';
+  document.title=D.title||'Student Tracker';
+  TODAY=getToday(); YEST=getYest();
+  ge('AD').value=TODAY; ge('EDt').value=TODAY; ge('EVD').value=TODAY;
+  if(D.notes){ge('QN').value=D.notes;}
+  applyTheme();
+  startClock();
+  wireButtons();
+  bootRender();
+}
+
+/* ─── CLOCK ─── */
+function startClock(){
+  function tick(){
+    var n=new Date(),h=n.getHours(),m=n.getMinutes(),s=n.getSeconds();
+    var ap=h>=12?'PM':'AM'; h=h%12||12;
+    var el=ge('CLOCK');
+    if(el){el.textContent=(h<10?'0':'')+h+':'+(m<10?'0':'')+m+':'+(s<10?'0':'')+s+' '+ap;}
+  }
+  tick(); setInterval(tick,1000);
+}
+
+/* ─── THEME ─── */
+function applyTheme(){
+  var dark=D.theme==='dark';
+  document.body.classList.toggle('light',!dark);
+  var tog=ge('TGTOG'); if(tog){tog.checked=dark;}
+}
+
+/* ─── WIRE ALL BUTTONS (no inline onclick) ─── */
+function wireButtons(){
+  /* NAV */
+  document.querySelectorAll('.nb').forEach(function(b){
+    b.addEventListener('click',function(){go(b.dataset.p);});
+  });
+  ge('MMB').addEventListener('click',function(){ge('SB').classList.toggle('open');ge('OV').classList.toggle('show');});
+  ge('OV').addEventListener('click',function(){ge('SB').classList.remove('open');ge('OV').classList.remove('show');});
+  ge('APPTITLE').addEventListener('click',function(){var n=prompt('App name:',D.title||'Student Tracker');if(n&&n.trim()){D.title=n.trim();ge('APPTITLE').textContent=D.title;ge('MTITLE').textContent=D.title;document.title=D.title;saveD();}});
+
+  /* DASHBOARD shortcuts */
+  ge('btnGoAtt').addEventListener('click',function(){go('attendance');});
+  ge('btnGoTodo').addEventListener('click',function(){go('todo');});
+  ge('btnGoExp').addEventListener('click',function(){go('expenses');});
+  ge('btnGoPlan').addEventListener('click',function(){go('planner');});
+
+  /* PLANNER */
+  ge('btnAddPlanToday').addEventListener('click',function(){addPlan(0);});
+  ge('btnAddPlanTom').addEventListener('click',function(){addPlan(1);});
+  ge('QN').addEventListener('input',function(){D.notes=ge('QN').value;saveD();});
+
+  /* ATTENDANCE */
+  /* ATTENDANCE date nav */
+  ge('btnAddSubj').addEventListener('click',addSubj);
+  ge('AN').addEventListener('keydown',function(e){if(e.key==='Enter'){addSubj();}});
+  ge('AD').addEventListener('change',function(){renderAtt();updateAttQuickBtns();});
+  ge('btnAttPrev').addEventListener('click',function(){shiftDate('AD',-1);renderAtt();updateAttQuickBtns();});
+  ge('btnAttNext').addEventListener('click',function(){
+    var next=shiftDate('AD',1);
+    if(next>TODAY){ge('AD').value=TODAY;}
+    renderAtt();updateAttQuickBtns();
+  });
+  ge('btnAttYest').addEventListener('click',function(){ge('AD').value=YEST;renderAtt();updateAttQuickBtns();});
+  ge('btnAttToday').addEventListener('click',function(){ge('AD').value=TODAY;renderAtt();updateAttQuickBtns();});
+  ge('at0').addEventListener('click',function(){attTab(0);});
+  ge('at1').addEventListener('click',function(){attTab(1);});
+  ge('at2').addEventListener('click',function(){attTab(2);});
+  ge('at3').addEventListener('click',function(){attTab(3);});
+  ge('CAL_SUB').addEventListener('change',function(){renderCal();});
+
+  /* EXPENSES */
+  ge('btnAddTxn').addEventListener('click',addTxn);
+  /* Expense ADD date nav */
+  ge('btnExpPrev').addEventListener('click',function(){shiftDate('EDt',-1);updateExpQuickBtns();});
+  ge('btnExpNext').addEventListener('click',function(){shiftDate('EDt',1);updateExpQuickBtns();});
+  ge('btnExpYest').addEventListener('click',function(){ge('EDt').value=YEST;updateExpQuickBtns();});
+  ge('btnExpToday').addEventListener('click',function(){ge('EDt').value=TODAY;updateExpQuickBtns();});
+  /* Expense VIEW date nav */
+  ge('btnViewPrev').addEventListener('click',function(){shiftDate('EVD',-1);renderExp();updateViewQuickBtns();});
+  ge('btnViewNext').addEventListener('click',function(){shiftDate('EVD',1);renderExp();updateViewQuickBtns();});
+  ge('btnViewYest').addEventListener('click',function(){ge('EVD').value=YEST;renderExp();updateViewQuickBtns();});
+  ge('btnViewToday').addEventListener('click',function(){ge('EVD').value=TODAY;renderExp();updateViewQuickBtns();});
+  ge('EVD').addEventListener('change',function(){renderExp();updateViewQuickBtns();});
+  ge('et0').addEventListener('click',function(){expTab(0);});
+  ge('et1').addEventListener('click',function(){expTab(1);});
+  ge('et2').addEventListener('click',function(){expTab(2);});
+
+  /* TODO */
+  ge('btnAddTodo').addEventListener('click',addTodo);
+  ge('TT').addEventListener('keydown',function(e){if(e.key==='Enter'){addTodo();}});
+  ge('tf0').addEventListener('click',function(){todoFilt(0);});
+  ge('tf1').addEventListener('click',function(){todoFilt(1);});
+  ge('tf2').addEventListener('click',function(){todoFilt(2);});
+  ge('tf3').addEventListener('click',function(){todoFilt(3);});
+  ge('tf4').addEventListener('click',function(){todoFilt(4);});
+
+  /* SETTINGS */
+  ge('btnChangeName').addEventListener('click',function(){
+    var row=ge('NAME_EDIT_ROW');
+    ge('NAME_INPUT').value=D.name||'';
+    row.style.display='block';
+    ge('NAME_INPUT').focus();
+  });
+  ge('btnSaveName').addEventListener('click',function(){
+    var n=ge('NAME_INPUT').value.trim();
+    if(!n){showToast('Name cannot be empty');return;}
+    D.name=n; saveD();
+    ge('UNAME').textContent=n+'!';
+    ge('SET_NAME').textContent=n;
+    ge('SET_NAME_BIG').textContent=n;
+    ge('NAME_EDIT_ROW').style.display='none';
+    showToast('✓ Name updated!');
+  });
+  ge('NAME_INPUT').addEventListener('keydown',function(e){if(e.key==='Enter'){ge('btnSaveName').click();}});
+  ge('btnCancelName').addEventListener('click',function(){
+    ge('NAME_EDIT_ROW').style.display='none';
+  });
+  ge('btnGoSubjects').addEventListener('click',function(){
+    go('attendance'); attTab(3);
+  });
+  ge('TGTOG').addEventListener('change',function(){
+    D.theme=ge('TGTOG').checked?'dark':'light'; applyTheme(); saveD();
+  });
+  ge('btnDlReport').addEventListener('click',function(){dlReport();});
+  /* Report range buttons */
+  var rptDays=7;
+  function setRptRange(days,btn){
+    rptDays=days;
+    ['rpt7','rpt30','rpt90','rptCustom'].forEach(function(id){
+      var b=ge(id); if(b){b.classList.remove('on');}
+    });
+    if(btn){ge(btn).classList.add('on');}
+    ge('RPT_CUSTOM').style.display=days==='custom'?'':'none';
+    var now=new Date();
+    var preview='';
+    if(btn==='rptCustom'||days==='custom'){preview='📅 Select dates above';}
+    else{
+      var label=days===7?'Last 7 days':days===30?'Last 1 month':'Last 3 months';
+      var from=new Date();from.setDate(now.getDate()-days);
+      preview='📅 '+label+' ('+fmtDate([from.getFullYear(),String(from.getMonth()+1).padStart(2,'0'),String(from.getDate()).padStart(2,'0')].join('-'))+' → '+fmtDate(getToday())+')';
+    }
+    var p=ge('RPT_PREVIEW');if(p){p.textContent=preview;}
+  }
+  ge('rpt7').addEventListener('click',function(){setRptRange(7,'rpt7');});
+  ge('rpt30').addEventListener('click',function(){setRptRange(30,'rpt30');});
+  ge('rpt90').addEventListener('click',function(){setRptRange(90,'rpt90');});
+  ge('rptCustom').addEventListener('click',function(){setRptRange('custom','rptCustom');});
+  ge('RPT_FROM').addEventListener('change',function(){
+    var f=ge('RPT_FROM').value,t=ge('RPT_TO').value;
+    var p=ge('RPT_PREVIEW');if(p&&f&&t){p.textContent='📅 Range: '+fmtDate(f)+' → '+fmtDate(t);}
+  });
+  ge('RPT_TO').addEventListener('change',function(){
+    var f=ge('RPT_FROM').value,t=ge('RPT_TO').value;
+    var p=ge('RPT_PREVIEW');if(p&&f&&t){p.textContent='📅 Range: '+fmtDate(f)+' → '+fmtDate(t);}
+  });
+  /* init report date range */
+  var rptNow=new Date();
+  var rptFrom=new Date();rptFrom.setDate(rptNow.getDate()-7);
+  ge('RPT_FROM').value=getToday();
+  ge('RPT_TO').value=getToday();
+  /* init todo day/month/year selects */
+  var tdD=ge('TD_D');
+  for(var di=1;di<=31;di++){var o=document.createElement('option');o.value=String(di).padStart(2,'0');o.textContent=di;tdD.appendChild(o);}
+  var tdY=ge('TD_Y');
+  var curY=new Date().getFullYear();
+  for(var yi=curY;yi<=curY+3;yi++){var oy=document.createElement('option');oy.value=yi;oy.textContent=yi;tdY.appendChild(oy);}
+  /* Set today as default */
+  var tnow=new Date();
+  ge('TD_D').value=String(tnow.getDate()).padStart(2,'0');
+  ge('TD_M').value=String(tnow.getMonth()+1).padStart(2,'0');
+  ge('TD_Y').value=tnow.getFullYear();
+  ge('btnClearReports').addEventListener('click',function(){
+    if(!D.savedReports||!D.savedReports.length){showToast('No reports to clear');return;}
+    if(!confirm('Remove all saved reports from the list?')){return;}
+    D.savedReports=[];saveD();renderSavedReports();showToast('Reports list cleared');
+  });
+  ge('btnClearData').addEventListener('click',function(){
+    if(!confirm('Delete ALL data? This cannot be undone!')){return;}
+    D.subjects=[];D.txns=[];D.todos=[];D.plans={};D.notes='';saveD();
+    ge('QN').value=''; bootRender(); showToast('All data cleared');
+  });
+
+  /* Attendance Report */
+  var attRptDays=7;
+  function setAttRptRange(days,btn){
+    attRptDays=days;
+    ['arpt7','arpt30','arpt90','arptCustom'].forEach(function(id){var b=ge(id);if(b)b.classList.remove('on');});
+    if(btn){var bb=ge(btn);if(bb)bb.classList.add('on');}
+    var c=ge('ATT_RPT_CUSTOM');if(c)c.style.display=days==='custom'?'':'none';
+    var lbl=days===7?'Last 7 days':days===30?'Last 1 month':days===90?'Last 3 months':'Custom range';
+    var p=ge('ATT_RPT_PREVIEW');if(p)p.textContent='📅 '+lbl;
+  }
+  ge('arpt7').addEventListener('click',function(){setAttRptRange(7,'arpt7');});
+  ge('arpt30').addEventListener('click',function(){setAttRptRange(30,'arpt30');});
+  ge('arpt90').addEventListener('click',function(){setAttRptRange(90,'arpt90');});
+  ge('arptCustom').addEventListener('click',function(){setAttRptRange('custom','arptCustom');});
+  ge('btnDlAttReport').addEventListener('click',function(){dlAttReport();});
+
+}
+
+/* ─── PDF OVERLAY BUTTONS ─── */
+/* ─── NAV ─── */
+function go(p){
+  currentPage=p;
+  document.querySelectorAll('.page').forEach(function(x){x.classList.remove('on');});
+  document.querySelectorAll('.nb').forEach(function(x){x.classList.remove('on');});
+  var pg=ge('page-'+p); var nb=document.querySelector('[data-p="'+p+'"]');
+  if(pg){pg.classList.add('on');} if(nb){nb.classList.add('on');}
+  ge('SB').classList.remove('open'); ge('OV').classList.remove('show');
+  /* Push history so back button works */
+  /* Push state for back button — always keep one state ahead */
+  if(window.history&&window.history.pushState){
+    history.pushState({app:true,page:p},'',window.location.href);
+  }
+  if(p==='dashboard'){rDash();}
+  if(p==='attendance'){renderAtt();}
+  if(p==='expenses'){renderExp();}
+  if(p==='todo'){renderTodo();}
+  if(p==='planner'){renderPlan();}
+  if(p==='settings'){
+    var nm=D.name||'—';
+    ge('SET_NAME').textContent=nm;
+    ge('SET_NAME_BIG').textContent=nm;
+    ge('SET_SUBJ_COUNT').textContent=D.subjects.length+' subject'+(D.subjects.length!==1?'s':'')+' added';
+    ge('SET_TXN').textContent=D.txns.length;
+    ge('SET_TODO').textContent=D.todos.length;
+    var totalRecs=D.subjects.reduce(function(a,s){return a+s.records.length;},0);
+    ge('SET_ATT').textContent=totalRecs;
+    var tog=ge('TGTOG'); if(tog){tog.checked=D.theme==='dark';}
+    renderSavedReports();
+  }
+}
+
+/* ─── DATE SHIFT HELPER ─── */
+function shiftDate(inputId, days){
+  var inp=ge(inputId); if(!inp){return TODAY;}
+  var d=new Date((inp.value||TODAY)+'T12:00:00');
+  d.setDate(d.getDate()+days);
+  var ds=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");
+  inp.value=ds; return ds;
+}
+function updateAttQuickBtns(){
+  var v=ge('AD').value||TODAY;
+  var yb=ge('btnAttYest'),tb=ge('btnAttToday');
+  if(yb){yb.classList.toggle('on',v===YEST);}
+  if(tb){tb.classList.toggle('on',v===TODAY);}
+}
+function updateExpQuickBtns(){
+  var v=ge('EDt').value||TODAY;
+  var yb=ge('btnExpYest'),tb=ge('btnExpToday');
+  if(yb){yb.classList.toggle('on',v===YEST);}
+  if(tb){tb.classList.toggle('on',v===TODAY);}
+}
+function updateViewQuickBtns(){
+  var v=ge('EVD').value||TODAY;
+  var yb=ge('btnViewYest'),tb=ge('btnViewToday');
+  if(yb){yb.classList.toggle('on',v===YEST);}
+  if(tb){tb.classList.toggle('on',v===TODAY);}
+}
+
+/* ─── ATTENDANCE ─── */
+var atv=0, calY=new Date().getFullYear(), calM=new Date().getMonth();
+function attTab(t){
+  atv=t;
+  for(var i=0;i<4;i++){var b=ge('at'+i);if(b){b.classList.toggle('on',i===t);}}
+  ge('AMS').style.display  = t===0?'':'none';
+  ge('AHS').style.display  = t===1?'':'none';
+  ge('ASS').style.display  = t===2?'':'none';
+  ge('AMS2').style.display = t===3?'':'none';
+  if(t===1){buildCalSubs();renderCal();}
+  if(t===3){renderManageSubjects();}
+}
+function addSubj(){
+  var n=ge('AN').value.trim(); if(!n){return;}
+  if(D.subjects.some(function(s){return s.name.toLowerCase()===n.toLowerCase();})){showToast('Subject already exists!');return;}
+  D.subjects.push({id:Date.now(),name:n,records:[]});
+  saveD(); ge('AN').value='';
+  showToast('✓ '+n+' saved permanently!');
+  renderAtt(); buildCalSubs();
+}
+function markA(id,st){
+  var d=ge('AD').value||TODAY;
+  var sub=D.subjects.find(function(s){return s.id===id;}); if(!sub){return;}
+  var ex=sub.records.find(function(r){return r.date===d;});
+  if(ex){ex.status=st;} else{sub.records.push({date:d,status:st});}
+  saveD();
+  var stLabel=st==='present'?'✓ Present':st==='absent'?'✗ Absent':'🏖 Holiday';
+  showToast(stLabel+' marked!');
+  renderAtt();
+}
+function delSubj(id){
+  if(!confirm('Delete subject? All attendance records for this subject will also be deleted.')){return;}
+  D.subjects=D.subjects.filter(function(s){return s.id!==id;});
+  saveD(); renderAtt(); buildCalSubs();
+  if(atv===3){renderManageSubjects();}
+  showToast('Subject deleted');
+}
+function sPct(s){
+  var c=s.records.filter(function(r){return r.status!=='holiday';});
+  var a=c.filter(function(r){return r.status==='present';}).length;
+  return c.length?Math.round(a/c.length*100):null;
+}
+function renderAtt(){
+  var subs=D.subjects,totC=0,totA=0;
+  subs.forEach(function(s){var c=s.records.filter(function(r){return r.status!=='holiday';});totC+=c.length;totA+=c.filter(function(r){return r.status==='present';}).length;});
+  var ov=totC?Math.round(totA/totC*100):null;
+  var safe=subs.filter(function(s){var p=sPct(s);return p!==null&&p>=75;}).length;
+  ge('aO').textContent=ov!==null?ov+'%':'—'; ge('aN2').textContent=subs.length;
+  ge('aSF').textContent=safe; ge('aRK').textContent=subs.filter(function(s){var p=sPct(s);return p!==null&&p<75;}).length;
+  var d=ge('AD').value||TODAY, dn=new Date(d+'T12:00:00'), dy=DAYS[dn.getDay()];
+  var isSun=dn.getDay()===0, isYest=d===YEST, isFut=d>TODAY;
+  ge('ADN').innerHTML=isFut?'<span style="color:var(--dn)">Cannot mark future dates</span>':isSun?'<span style="color:var(--a4)">⚠ Sunday — consider Holiday</span>':isYest?'<span style="color:var(--a2)">📝 Editing Yesterday</span>':'<span style="color:var(--mu)">'+dy+'</span>';
+  ge('AML').textContent='Mark for '+(d===TODAY?'Today':d===YEST?'Yesterday':d)+' ('+dy+')';
+  var mH='';
+  if(!subs.length){mH='<p style="color:var(--mu);font-size:.81rem;text-align:center;padding:14px">No subjects yet.</p>';}
+  else if(isFut){mH='<p style="color:var(--dn);font-size:.81rem;font-weight:600;padding:10px">Cannot mark future dates.</p>';}
+  else{
+    subs.forEach(function(s){
+      var p=sPct(s),pv=p!==null?p:0;
+      var bc=pv>=75?'#3dd68c':pv>=60?'#ffd166':'#ff5c5c';
+      var rec=s.records.find(function(r){return r.date===d;}),st=rec?rec.status:null;
+      var cnt=s.records.filter(function(r){return r.status!=='holiday';});
+      var att=cnt.filter(function(r){return r.status==='present';}).length;
+      var bC=p===null?'var(--mu)':p>=75?'#3dd68c':p>=60?'#ffd166':'#ff5c5c';
+      var bT=p===null?'No records':p>=75?'Safe ✓':p>=60?'⚠ Warn':'✗ Risk';
+      mH+='<div class="sr">';
+      mH+='<div style="flex:1;min-width:100px">';
+      mH+='<div style="font-weight:700;font-size:.86rem">'+es(s.name)+'</div>';
+      mH+='<div style="font-size:.65rem;color:var(--mu);font-weight:600;margin-top:3px">'+att+'/'+cnt.length+' · '+pv+'%</div>';
+      mH+='<div class="abar"><div class="afill" style="width:'+pv+'%;background:'+bc+'"></div></div>';
+      mH+='</div>';
+      mH+='<div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap">';
+      mH+='<button class="pb pp'+(st==='present'?' on':'')+'" data-sid="'+s.id+'" data-st="present">✓ P</button>';
+      mH+='<button class="pb pa'+(st==='absent'?' on':'')+'" data-sid="'+s.id+'" data-st="absent">✗ A</button>';
+      mH+='<button class="pb ph2'+(st==='holiday'?' on':'')+'" data-sid="'+s.id+'" data-st="holiday">🏖 H</button>';
+      mH+='<span class="bdg" style="background:'+bC+'22;color:'+bC+'">'+bT+'</span>';
+      mH+='<button class="ib del-subj-btn" data-sid="'+s.id+'">✕</button>';
+      mH+='</div></div>';
+    });
+  }
+  ge('SL').innerHTML=mH;
+  ge('SL').querySelectorAll('[data-sid][data-st]').forEach(function(btn){
+    btn.addEventListener('click',function(){markA(parseInt(btn.dataset.sid),btn.dataset.st);});
+  });
+  ge('SL').querySelectorAll('.del-subj-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){delSubj(parseInt(btn.dataset.sid));});
+  });
+  /* Stats */
+  var stH='';
+  if(!subs.length){stH='<p style="color:var(--mu);font-size:.81rem">No subjects yet.</p>';}
+  else{
+    subs.forEach(function(s){
+      var cnt=s.records.filter(function(r){return r.status!=='holiday';});
+      var a2=cnt.filter(function(r){return r.status==='present';}).length;
+      var ab=cnt.filter(function(r){return r.status==='absent';}).length;
+      var ho=s.records.filter(function(r){return r.status==='holiday';}).length;
+      var p2=cnt.length?Math.round(a2/cnt.length*100):null;
+      var nd=(p2!==null&&p2<75)?Math.ceil((75*cnt.length-100*a2)/(100-75)):0;
+      var bc2=p2===null?'var(--mu)':p2>=75?'#3dd68c':p2>=60?'#ffd166':'#ff5c5c';
+      stH+='<div class="sr" style="flex-direction:column;align-items:flex-start;gap:7px">';
+      stH+='<div style="display:flex;width:100%;justify-content:space-between;align-items:center"><span style="font-weight:700;font-size:.87rem">'+es(s.name)+'</span><span style="font-family:\'Outfit\',sans-serif;font-size:1.1rem;font-weight:800;color:'+bc2+'">'+(p2!==null?p2+'%':'—')+'</span></div>';
+      stH+='<div style="display:flex;gap:10px;font-size:.7rem;font-weight:600;flex-wrap:wrap"><span style="color:var(--ok)">✓ '+a2+'</span><span style="color:var(--dn)">✗ '+ab+'</span><span style="color:var(--a4)">🏖 '+ho+'</span><span style="color:var(--mu)">Total: '+s.records.length+'</span>'+(nd>0?'<span style="color:var(--a2)">Need '+nd+' more for 75%</span>':'')+'</div>';
+      stH+='<div class="abar" style="width:100%"><div class="afill" style="width:'+(p2||0)+'%;background:'+bc2+'"></div></div>';
+      stH+='</div>';
+    });
+  }
+  ge('SSL').innerHTML=stH;
+}
+
+/* ─── CALENDAR ─── */
+function buildCalSubs(){
+  var sel=ge('CAL_SUB'),pv=sel.value; sel.innerHTML='';
+  D.subjects.forEach(function(s){var o=document.createElement('option');o.value=s.id;o.textContent=s.name;sel.appendChild(o);});
+  if(pv){sel.value=pv;}
+}
+function renderCal(){
+  var selId=parseInt(ge('CAL_SUB').value)||0;
+  var sub=D.subjects.find(function(s){return s.id===selId;});
+  var wrap=ge('CAL_WRAP'); if(!wrap){return;}
+  var h='<div class="calhdr"><button class="calnav" id="calPrevBtn">&#8249;</button><div class="caltitle">'+MNS[calM]+' '+calY+'</div><button class="calnav" id="calNextBtn">&#8250;</button></div>';
+  h+='<div class="calgrid">';
+  ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(function(l){h+='<div class="caldl">'+l+'</div>';});
+  var fd=new Date(calY,calM,1).getDay(), dim=new Date(calY,calM+1,0).getDate();
+  for(var i=0;i<fd;i++){h+='<div class="cday empty"></div>';}
+  for(var day=1;day<=dim;day++){
+    var ds=calY+'-'+String(calM+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    var cls='cday';
+    if(ds===TODAY){cls+=' tod';}
+    if(ds>TODAY){cls+=' fut';}
+    var rec=sub?sub.records.find(function(r){return r.date===ds;}):null;
+    var st=rec?rec.status:null;
+    if(st==='present'){cls+=' pres';}else if(st==='absent'){cls+=' abs';}else if(st==='holiday'){cls+=' hol';}
+    var isSun=new Date(ds+'T12:00:00').getDay()===0;
+    var sty=isSun&&!st?'opacity:.35':'';
+    var canClick=ds<=TODAY&&sub?true:false;
+    h+='<div class="'+cls+'" style="'+sty+'"'+(canClick?' data-calday="'+ds+'"':'')+'>'+day+'</div>';
+  }
+  h+='</div>';
+  wrap.innerHTML=h;
+  wrap.querySelectorAll('[data-calday]').forEach(function(el){
+    el.addEventListener('click',function(){calClick(el.dataset.calday);});
+  });
+  var pb=ge('calPrevBtn'); if(pb){pb.addEventListener('click',function(){calM--;if(calM<0){calM=11;calY--;}renderCal();});}
+  var nb=ge('calNextBtn'); if(nb){nb.addEventListener('click',function(){calM++;if(calM>11){calM=0;calY++;}renderCal();});}
+}
+function calClick(ds){
+  var selId=parseInt(ge('CAL_SUB').value)||0;
+  var sub=D.subjects.find(function(s){return s.id===selId;}); if(!sub){return;}
+  var rec=sub.records.find(function(r){return r.date===ds;});
+  var cur=rec?rec.status:null;
+  var nxt=cur===null?'present':cur==='present'?'absent':cur==='absent'?'holiday':null;
+  if(nxt===null){sub.records=sub.records.filter(function(r){return r.date!==ds;});}
+  else{if(rec){rec.status=nxt;}else{sub.records.push({date:ds,status:nxt});}}
+  saveD(); renderCal(); renderAtt();
+}
+
+/* ─── EXPENSES ─── */
+var etv=0;
+function expTab(t){etv=t;for(var i=0;i<3;i++){ge('et'+i).classList.toggle('on',i===t);}ge('EP0').style.display=t===0?'':'none';ge('EP1').style.display=t===1?'':'none';ge('EP2').style.display=t===2?'':'none';}
+function addTxn(){
+  var desc=ge('ED').value.trim(),amt=parseFloat(ge('EA').value)||0;
+  if(!desc||!amt){return;}
+  D.txns.unshift({id:Date.now(),desc:desc,amt:amt,type:ge('ET').value,cat:ge('EC').value,date:ge('EDt').value||TODAY});
+  saveD(); ge('ED').value=''; ge('EA').value=''; showToast('✓ Transaction saved!'); renderExp();
+}
+function delTxn(id){D.txns=D.txns.filter(function(t){return t.id!==id;});saveD();renderExp();}
+function txH(list){
+  if(!list.length){return'<p style="color:var(--mu);font-size:.81rem;text-align:center;padding:12px">No transactions.</p>';}
+  var h='';
+  list.forEach(function(t){
+    var ic=CC[t.cat]||'#888',cl=t.type==='income'?'#3dd68c':'#ff5c5c',sg=t.type==='income'?'+':'-';
+    h+='<div class="txr">';
+    h+='<div class="txic" style="background:'+ic+'22">'+t.cat.split(' ')[0]+'</div>';
+    h+='<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.83rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+es(t.desc)+'</div>';
+    h+='<div style="font-size:.65rem;color:var(--mu);margin-top:2px">'+t.cat+' · '+t.date+'</div></div>';
+    h+='<div style="font-family:\'Outfit\',sans-serif;font-weight:800;color:'+cl+';white-space:nowrap;font-size:.9rem">'+sg+fR(t.amt)+'</div>';
+    h+='<button class="ib del-txn-btn" data-tid="'+t.id+'">✕</button></div>';
+  });
+  return h;
+}
+function bindTxnDel(el){el.querySelectorAll('.del-txn-btn').forEach(function(b){b.addEventListener('click',function(){delTxn(parseInt(b.dataset.tid));});});}
+function pSpent(tp){
+  var now=new Date();
+  if(tp==='today'){return D.txns.filter(function(t){return t.date===TODAY&&t.type==='expense';}).reduce(function(a,t){return a+t.amt;},0);}
+  if(tp==='week'){var ws=new Date(now);ws.setDate(now.getDate()-now.getDay());return D.txns.filter(function(t){var d=new Date(t.date+'T12:00');return d>=ws&&t.type==='expense';}).reduce(function(a,t){return a+t.amt;},0);}
+  if(tp==='month'){return D.txns.filter(function(t){var d=new Date(t.date+'T12:00');return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear()&&t.type==='expense';}).reduce(function(a,t){return a+t.amt;},0);}
+  return 0;
+}
+function renderExp(){
+  var inc=D.txns.filter(function(t){return t.type==='income';}).reduce(function(a,t){return a+t.amt;},0);
+  var sp=D.txns.filter(function(t){return t.type==='expense';}).reduce(function(a,t){return a+t.amt;},0);
+  ge('eI').textContent=fR(inc);ge('eX').textContent=fR(sp);ge('eB').textContent=fR(inc-sp);ge('eT').textContent=fR(pSpent('today'));
+  ge('ePT').textContent=fR(pSpent('today'));ge('ePW').textContent=fR(pSpent('week'));ge('ePM').textContent=fR(pSpent('month'));
+  var l7=[];for(var i=0;i<7;i++){var d=new Date();d.setDate(d.getDate()-(6-i));var ds=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");var s=D.txns.filter(function(t){return t.date===ds&&t.type==='expense';}).reduce(function(a,t){return a+t.amt;},0);l7.push({date:ds,lbl:d.toLocaleDateString('en-IN',{weekday:'short'}),sp:s});}
+  var mx=Math.max.apply(null,l7.map(function(x){return x.sp;}).concat([1]));var ch='';
+  l7.forEach(function(d){var h2=d.sp>0?Math.max(d.sp/mx*70,5):2;var cl=d.date===TODAY?'#7b68ee':'#ff7b5c';ch+='<div class="bc"><div style="font-size:.51rem;color:var(--mu);font-weight:600">'+(d.sp>0?fR(d.sp).replace('₹',''):'')+'</div><div class="bb" style="height:'+h2+'px;background:'+cl+';opacity:'+(d.sp===0?.15:1)+'"></div><div style="font-size:.55rem;font-weight:700;color:'+(d.date===TODAY?'#7b68ee':'var(--mu)')+'">'+d.lbl+'</div></div>';});
+  ge('EC2').innerHTML=ch;
+  var vd=ge('EVD').value||TODAY;var dt=D.txns.filter(function(t){return t.date===vd;});
+  var di=dt.filter(function(t){return t.type==='income';}).reduce(function(a,t){return a+t.amt;},0);
+  var ds2=dt.filter(function(t){return t.type==='expense';}).reduce(function(a,t){return a+t.amt;},0);
+  ge('EDS').innerHTML='<span style="color:var(--ok)">+'+fR(di)+'</span> <span style="color:var(--dn)">-'+fR(ds2)+'</span> <span style="color:var(--acc);font-weight:800">Net: '+fR(di-ds2)+'</span>'+(vd===YEST?' <span style="color:var(--a2);font-size:.7rem">📝 Yesterday</span>':'');
+  var dl=ge('EDL');dl.innerHTML=txH(dt);bindTxnDel(dl);
+  var al=ge('EAL');al.innerHTML=txH(D.txns);bindTxnDel(al);
+  var cats={};D.txns.filter(function(t){return t.type==='expense';}).forEach(function(t){cats[t.cat]=(cats[t.cat]||0)+t.amt;});
+  var cm=Math.max.apply(null,Object.values(cats).concat([1]));var cH='';
+  Object.entries(cats).sort(function(a,b){return b[1]-a[1];}).forEach(function(e){var c=e[0],v=e[1],ic=CC[c]||'#888';cH+='<div style="display:flex;align-items:center;gap:9px;margin-bottom:10px"><div style="width:20px;font-size:.9rem">'+c.split(' ')[0]+'</div><div style="flex:0 0 105px;font-size:.73rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+c+'</div><div style="flex:1;height:5px;background:var(--bdr);border-radius:99px;overflow:hidden"><div style="height:100%;width:'+Math.round(v/cm*100)+'%;background:'+ic+';border-radius:99px"></div></div><div style="font-size:.77rem;font-weight:800;color:'+ic+';min-width:60px;text-align:right;font-family:\'Outfit\',sans-serif">'+fR(v)+'</div></div>';});
+  ge('ECL').innerHTML=cH||'<p style="color:var(--mu);font-size:.81rem">No expenses yet.</p>';
+}
+
+/* ─── TODO ─── */
+var tfv=0;
+function todoFilt(f){tfv=f;for(var i=0;i<5;i++){ge('tf'+i).classList.toggle('on',i===f);}renderTodo();}
+function addTodo(){
+  var title=ge('TT').value.trim(); if(!title){return;}
+  var dd=ge('TD_D').value, dm=ge('TD_M').value, dy=ge('TD_Y').value;
+  var due=(dd&&dm&&dy)?dy+'-'+dm+'-'+dd:'';
+  D.todos.unshift({id:Date.now(),title:title,priority:ge('TP').value,cat:ge('TC').value,subject:ge('TS').value.trim(),due:due,done:false});
+  saveD(); ge('TT').value=''; ge('TS').value=''; showToast('✓ Task saved!'); renderTodo();
+}
+function togTodo(id){var t=D.todos.find(function(x){return x.id===id;});if(t){t.done=!t.done;}saveD();renderTodo();}
+function delTodo(id){D.todos=D.todos.filter(function(t){return t.id!==id;});saveD();renderTodo();}
+function renderTodo(){
+  var tot=D.todos.length,dn=D.todos.filter(function(t){return t.done;}).length;
+  var dtt=D.todos.filter(function(t){return t.due===TODAY&&!t.done;}).length;
+  ge('tTo').textContent=tot;ge('tPe').textContent=tot-dn;ge('tDo').textContent=dn;ge('tTd').textContent=dtt;
+  var list=D.todos.slice();
+  if(tfv===1){list=list.filter(function(t){return !t.done;});}
+  if(tfv===2){list=list.filter(function(t){return t.done;});}
+  if(tfv===3){list=list.filter(function(t){return t.priority==='high'&&!t.done;});}
+  if(tfv===4){list=list.filter(function(t){return t.due===TODAY&&!t.done;});}
+  /* Sort: nearest due date first, overdue highlighted, no-date at bottom, done at very bottom */
+  list.sort(function(a,b){
+    if(a.done!==b.done){return a.done?1:-1;}
+    var ad=a.due||'9999-99-99', bd=b.due||'9999-99-99';
+    return ad.localeCompare(bd);
+  });
+  var PC={high:'#ff5c5c',med:'#ffd166',low:'#3dd68c'},PL={high:'🔴 High',med:'🟡 Medium',low:'🟢 Low'};
+  if(!list.length){ge('TL').innerHTML='<p style="color:var(--mu);font-size:.81rem;text-align:center;padding:14px">No tasks found.</p>';return;}
+  var h='';
+  list.forEach(function(t){
+    var pc=PC[t.priority]||'#888',pl=PL[t.priority]||'';
+    h+='<div class="tor" style="opacity:'+(t.done?.5:1)+'">';
+    h+='<div class="chk'+(t.done?' done':'')+'" data-tid="'+t.id+'">'+(t.done?'<span style="color:#fff;font-size:.7rem;font-weight:800">✓</span>':'')+'</div>';
+    h+='<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:.86rem;text-decoration:'+(t.done?'line-through':'none')+'">'+es(t.title)+'</div>';
+    h+='<div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap"><span class="bdg" style="background:'+pc+'20;color:'+pc+'">'+pl+'</span>';
+    if(t.subject){h+='<span class="bdg" style="background:rgba(123,104,238,.15);color:var(--acc)">'+es(t.subject)+'</span>';}
+    h+='<span class="bdg" style="background:rgba(120,120,160,.12);color:var(--mu)">'+t.cat+'</span>';
+    if(t.due){
+      var isOverdue=!t.done&&t.due<TODAY;
+      var isDueToday=!t.done&&t.due===TODAY;
+      var dueBg=isOverdue?'rgba(255,92,92,.2)':isDueToday?'rgba(255,209,102,.2)':'rgba(255,123,92,.1)';
+      var dueColor=isOverdue?'#ff5c5c':isDueToday?'#ffd166':'var(--a2)';
+      var duePrefix=isOverdue?'⚠ Overdue: ':isDueToday?'📅 Today: ':'Due: ';
+      h+='<span class="bdg" style="background:'+dueBg+';color:'+dueColor+'">'+duePrefix+fmtDate(t.due)+'</span>';
+    }
+    h+='</div></div>';
+    h+='<button class="ib del-todo-btn" data-tid="'+t.id+'">✕</button>';
+    h+='</div>';
+  });
+  ge('TL').innerHTML=h;
+  ge('TL').querySelectorAll('.chk[data-tid]').forEach(function(el){el.addEventListener('click',function(){togTodo(parseInt(el.dataset.tid));});});
+  ge('TL').querySelectorAll('.del-todo-btn').forEach(function(el){el.addEventListener('click',function(){delTodo(parseInt(el.dataset.tid));});});
+}
+
+/* ─── PLANNER ─── */
+function addPlan(day){
+  var tEl=day===0?ge('PLT'):ge('PLTT'), kEl=day===0?ge('PLK'):ge('PLTK');
+  var task=kEl.value.trim(); if(!task){return;}
+  var key=day===0?TODAY:gt();
+  if(!D.plans[key]){D.plans[key]=[];}
+  D.plans[key].push({id:Date.now(),time:tEl.value,task:task});
+  saveD(); kEl.value=''; renderPlan();
+}
+function delPlan(key,id){
+  if(D.plans[key]){D.plans[key]=D.plans[key].filter(function(p){return p.id!==id;});}
+  saveD(); renderPlan();
+}
+function renderManageSubjects(){
+  var subs=D.subjects;
+  if(!subs.length){
+    ge('SUBJ_MANAGE').innerHTML='<p style="color:var(--mu);font-size:.81rem;text-align:center;padding:14px">No subjects yet. Add one above.</p>';
+    return;
+  }
+  var h='';
+  subs.forEach(function(s){
+    var p=sPct(s); var pv=p!==null?p:0;
+    var bc=pv>=75?'#3dd68c':pv>=60?'#ffd166':'#ff5c5c';
+    h+='<div class="sr" style="justify-content:space-between">';
+    h+='<div style="flex:1;min-width:0">';
+    h+='<div style="font-weight:700;font-size:.87rem">'+es(s.name)+'</div>';
+    h+='<div style="font-size:.65rem;color:var(--mu);margin-top:2px">'+s.records.length+' records · '+pv+'%</div>';
+    h+='<div class="abar" style="margin-top:5px"><div class="afill" style="width:'+pv+'%;background:'+bc+'"></div></div>';
+    h+='</div>';
+    h+='<div style="display:flex;gap:6px;align-items:center;margin-left:10px">';
+    h+='<button class="btn sm rename-subj-btn" data-sid="'+s.id+'" style="font-size:.72rem">✏️ Rename</button>';
+    h+='<button class="ib del-subj2-btn" data-sid="'+s.id+'" title="Delete">✕</button>';
+    h+='</div>';
+    h+='</div>';
+  });
+  ge('SUBJ_MANAGE').innerHTML=h;
+  ge('SUBJ_MANAGE').querySelectorAll('.rename-subj-btn').forEach(function(b){
+    b.addEventListener('click',function(){renameSubj(parseInt(b.dataset.sid));});
+  });
+  ge('SUBJ_MANAGE').querySelectorAll('.del-subj2-btn').forEach(function(b){
+    b.addEventListener('click',function(){delSubj(parseInt(b.dataset.sid));renderManageSubjects();});
+  });
+}
+function renameSubj(id){
+  var sub=D.subjects.find(function(s){return s.id===id;}); if(!sub){return;}
+  var n=prompt('Rename subject:',sub.name);
+  if(n===null){return;} n=n.trim(); if(!n){return;}
+  sub.name=n; saveD(); renderManageSubjects(); renderAtt(); buildCalSubs();
+  showToast('✓ Renamed to '+n);
+}
+function planHTML(plans,key,col){
+  if(!plans.length){return'<p style="color:var(--mu);font-size:.81rem;padding:4px">No plans yet.</p>';}
+  var h='';
+  plans.forEach(function(p){
+    h+='<div class="pblk" style="border-left-color:'+col+'">';
+    h+='<div class="ptm" style="color:'+col+'">⏰ '+p.time+'</div>';
+    h+='<div style="font-size:.84rem;font-weight:500">'+es(p.task)+'</div>';
+    h+='<button class="ib del-plan-btn" style="position:absolute;top:8px;right:8px" data-pkey="'+key+'" data-pid="'+p.id+'">✕</button>';
+    h+='</div>';
+  });
+  return h;
+}
+function renderPlan(){
+  var tk=gt();
+  var tp=(D.plans[TODAY]||[]).slice().sort(function(a,b){return a.time.localeCompare(b.time);});
+  var tm=(D.plans[tk]||[]).slice().sort(function(a,b){return a.time.localeCompare(b.time);});
+  ge('todayP').innerHTML=planHTML(tp,TODAY,'var(--acc)');
+  ge('tomP').innerHTML=planHTML(tm,tk,'var(--a2)');
+  document.querySelectorAll('.del-plan-btn').forEach(function(b){
+    b.addEventListener('click',function(){delPlan(b.dataset.pkey,parseInt(b.dataset.pid));});
+  });
+}
+
+/* ─── DASHBOARD ─── */
+function rDash(){
+  var subs=D.subjects,totC=0,totA=0;
+  subs.forEach(function(s){var c=s.records.filter(function(r){return r.status!=='holiday';});totC+=c.length;totA+=c.filter(function(r){return r.status==='present';}).length;});
+  ge('dA').textContent=totC?Math.round(totA/totC*100)+'%':'—';
+  var inc=D.txns.filter(function(t){return t.type==='income';}).reduce(function(a,t){return a+t.amt;},0);
+  var sp=D.txns.filter(function(t){return t.type==='expense';}).reduce(function(a,t){return a+t.amt;},0);
+  ge('dB').textContent=fR(inc-sp);ge('dS').textContent=fR(pSpent('today'));ge('dP').textContent=D.todos.filter(function(t){return !t.done;}).length;
+  var ta=subs.map(function(s){var r=s.records.find(function(x){return x.date===TODAY;});return{name:s.name,status:r?r.status:'unmarked'};});
+  if(!ta.length){ge('dAL').innerHTML='<p style="color:var(--mu);font-size:.81rem">No subjects yet.</p>';}
+  else{var h='';ta.forEach(function(s){var c=s.status==='present'?'#3dd68c':s.status==='absent'?'#ff5c5c':s.status==='holiday'?'#ffd166':'var(--mu)';var l=s.status==='present'?'✓ Present':s.status==='absent'?'✗ Absent':s.status==='holiday'?'🏖 Holiday':'• Unmarked';h+='<div class="dr"><span style="font-weight:600">'+es(s.name)+'</span><span class="bdg" style="background:'+c+'22;color:'+c+'">'+l+'</span></div>';});ge('dAL').innerHTML=h;}
+  var up=D.todos.filter(function(t){return !t.done&&t.due;}).sort(function(a,b){return a.due.localeCompare(b.due);}).slice(0,5);
+  if(!up.length){ge('dTL').innerHTML='<p style="color:var(--mu);font-size:.81rem">No upcoming tasks.</p>';}
+  else{var h2='';up.forEach(function(t){h2+='<div class="dr"><span style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%">'+es(t.title)+'</span><span class="bdg" style="background:rgba(255,123,92,.14);color:var(--a2)">'+fmtDate(t.due)+'</span></div>';});ge('dTL').innerHTML=h2;}
+  var low=subs.filter(function(s){var p=sPct(s);return p!==null&&p<75;});
+  if(!low.length){ge('dLL').innerHTML='<p style="color:var(--ok);font-size:.81rem;font-weight:600">✓ All subjects on track!</p>';}
+  else{var h3='';low.forEach(function(s){h3+='<div class="dr"><span style="font-weight:600">'+es(s.name)+'</span><span class="bdg" style="background:rgba(255,92,92,.12);color:var(--dn)">'+sPct(s)+'%</span></div>';});ge('dLL').innerHTML=h3;}
+  var tm=D.txns.filter(function(t){return t.date===TODAY;}).slice(0,5);
+  if(!tm.length){ge('dML').innerHTML='<p style="color:var(--mu);font-size:.81rem">Nothing logged today.</p>';}
+  else{var h4='';tm.forEach(function(t){var c=t.type==='income'?'#3dd68c':'#ff5c5c';h4+='<div class="dr"><span style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%">'+es(t.desc)+'</span><span style="color:'+c+';font-weight:800;font-size:.82rem;font-family:\'Outfit\',sans-serif">'+(t.type==='income'?'+':'-')+fR(t.amt)+'</span></div>';});ge('dML').innerHTML=h4;}
+  var tk=gt(),tpl=(D.plans[tk]||[]).slice().sort(function(a,b){return a.time.localeCompare(b.time);});
+  if(!tpl.length){ge('dTP').innerHTML='<p style="color:var(--mu);font-size:.81rem">No plans yet.</p>';}
+  else{var h5='';tpl.forEach(function(p){h5+='<div class="dr"><span style="font-weight:600">⏰ '+p.time+' — '+es(p.task)+'</span></div>';});ge('dTP').innerHTML=h5;}
+}
+
+
+/* ─── SAFE DOWNLOAD — Blob-based, works on Android WebView ─── */
+function dataUrlToBlob(dataUrl){
+  var parts=dataUrl.split(',');
+  var mime=parts[0].match(/:(.*?);/)[1];
+  var bin=atob(parts[1]);
+  var arr=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++){arr[i]=bin.charCodeAt(i);}
+  return new Blob([arr],{type:mime});
+}
+
+var _reportHtml = null, _reportName = null, _reportOpen = false;
+
+function androidDownload(html, filename){
+  _reportHtml = html;
+  _reportName = filename;
+  openReportOverlay(html, filename);
+}
+
+function openReportOverlay(html, filename){
+  var ov   = document.getElementById('RPT_OV');
+  var body = document.getElementById('RPT_OV_BODY');
+  var titl = document.getElementById('RPT_OV_TITLE');
+  if(!ov || !body){ return; }
+  if(titl) titl.textContent = filename;
+  body.innerHTML = html;
+  ov.classList.add('open');
+  _reportOpen = true;
+  if(window.history && window.history.pushState){
+    history.pushState({report:true}, '', window.location.href);
+  }
+}
+
+function closeReport(){
+  var ov   = document.getElementById('RPT_OV');
+  var body = document.getElementById('RPT_OV_BODY');
+  if(ov)   ov.classList.remove('open');
+  if(body) body.innerHTML = '';
+  _reportOpen = false;
+}
+
+/* Save PDF — works when file is saved locally on phone */
+function printReport(){
+  if(!_reportHtml){ showToast('No report loaded'); return; }
+  showToast('Generating PDF...');
+  setTimeout(function(){
+    try{
+      savePDFFromReport(_reportHtml, _reportName);
+    }catch(e){
+      showToast('Error: '+e.message);
+    }
+  }, 100);
+}
+
+function savePDFFromReport(html, name){
+  /* Parse the HTML to extract data and build clean PDF with jsPDF */
+  if(typeof window.jspdf==='undefined'){ showToast('PDF library not loaded yet, wait 2s'); return; }
+  var J = window.jspdf.jsPDF;
+  var pdf = new J({orientation:'portrait', unit:'mm', format:'a4'});
+  var W=210, M=14, y=M, lh=6.5;
+  var now = new Date();
+  var ds = now.getDate()+'/'+(now.getMonth()+1)+'/'+now.getFullYear();
+
+  function nl(n){ y += n||lh; if(y>282){ pdf.addPage(); y=M; } }
+  function line(){ pdf.setDrawColor(220,220,230); pdf.setLineWidth(0.2); pdf.line(M,y,W-M,y); nl(3); }
+  function hdr(txt,r,g,b){
+    pdf.setFillColor(r,g,b); pdf.rect(M,y,W-M*2,8,'F');
+    pdf.setTextColor(255,255,255); pdf.setFontSize(11); pdf.setFont('helvetica','bold');
+    pdf.text(txt, M+3, y+5.5); nl(10); pdf.setTextColor(30,30,30);
+  }
+  function row(lbl,val,vc){
+    if(y>278){pdf.addPage();y=M;}
+    pdf.setFontSize(9); pdf.setFont('helvetica','normal'); pdf.setTextColor(40,40,40);
+    pdf.text(String(lbl), M+2, y);
+    pdf.setFont('helvetica','bold');
+    if(vc){ pdf.setTextColor(vc[0],vc[1],vc[2]); }
+    var vs = String(val);
+    pdf.text(vs, W-M-2, y, {align:'right'});
+    pdf.setTextColor(40,40,40); nl();
+    pdf.setDrawColor(220,220,230); pdf.setLineWidth(0.1);
+    pdf.line(M,y-0.5,W-M,y-0.5);
+  }
+  function subhdr(txt){
+    if(y>275){pdf.addPage();y=M;}
+    pdf.setFillColor(240,242,255); pdf.rect(M,y,W-M*2,7,'F');
+    pdf.setTextColor(40,40,120); pdf.setFontSize(10); pdf.setFont('helvetica','bold');
+    pdf.text(txt, M+3, y+4.8); nl(9); pdf.setTextColor(40,40,40);
+  }
+
+  var isExp = html.indexOf('TOTAL INCOME') !== -1;
+
+  if(isExp){
+    /* ── EXPENSES PDF ── */
+    /* Parse totals from DOM */
+    var tmp = document.createElement('div'); tmp.innerHTML = html;
+    var cards = tmp.querySelectorAll('[style*="1.3rem"]');
+    var inc=0, exp=0;
+    try{
+      var texts = [];
+      tmp.querySelectorAll('div').forEach(function(d){
+        if(d.children.length===0 && d.textContent.trim()) texts.push(d.textContent.trim());
+      });
+      /* Find ₹ values */
+      var nums = texts.filter(function(t){ return t.indexOf('₹')!==-1 || t.indexOf('Rs')!==-1; });
+    }catch(e){}
+
+    /* Cover */
+    pdf.setFillColor(255,123,92); pdf.rect(0,0,W,42,'F');
+    pdf.setFillColor(220,80,50); pdf.rect(0,34,W,8,'F');
+    pdf.setTextColor(255,255,255);
+    pdf.setFontSize(20); pdf.setFont('helvetica','bold');
+    pdf.text('Expenses Report', W/2, 15, {align:'center'});
+    pdf.setFontSize(10); pdf.setFont('helvetica','normal');
+    pdf.text('Student Tracker  |  '+(D.name||'Student'), W/2, 24, {align:'center'});
+    pdf.setFontSize(8);
+    pdf.text('Generated: '+ds, W/2, 38, {align:'center'});
+    y=50; pdf.setTextColor(30,30,30);
+
+    /* Summary */
+    hdr('SUMMARY', 255,123,92);
+    var totalInc = D.txns.filter(function(t){return t.type==='income';}).reduce(function(a,t){return a+t.amt;},0);
+    var totalExp = D.txns.filter(function(t){return t.type==='expense';}).reduce(function(a,t){return a+t.amt;},0);
+    row('Total Income', 'Rs '+totalInc.toLocaleString('en-IN'), [61,150,80]);
+    row('Total Spent',  'Rs '+totalExp.toLocaleString('en-IN'), [200,60,60]);
+    row('Balance',      'Rs '+(totalInc-totalExp).toLocaleString('en-IN'), (totalInc-totalExp)>=0?[61,150,80]:[200,60,60]);
+    row('Transactions', D.txns.length);
+    nl(3);
+
+    /* Categories */
+    var cats={};
+    D.txns.filter(function(t){return t.type==='expense';}).forEach(function(t){ cats[t.cat]=(cats[t.cat]||0)+t.amt; });
+    var catList = Object.entries(cats).sort(function(a,b){return b[1]-a[1];});
+    if(catList.length){
+      hdr('EXPENSES BY CATEGORY', 200,80,50);
+      catList.forEach(function(e){
+        var pct = totalExp>0?Math.round(e[1]/totalExp*100):0;
+        row(e[0], 'Rs '+e[1].toLocaleString('en-IN')+' ('+pct+'%)', [180,60,40]);
+      });
+      nl(3);
+    }
+
+    /* Income */
+    var incTxns = D.txns.filter(function(t){return t.type==='income';}).sort(function(a,b){return b.date.localeCompare(a.date);});
+    if(incTxns.length){
+      hdr('INCOME', 61,150,80);
+      incTxns.forEach(function(t){
+        var d=new Date(t.date+'T12:00:00');
+        row(d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear()+'  '+t.desc.substring(0,35),
+            '+Rs '+t.amt.toLocaleString('en-IN'), [61,150,80]);
+      });
+      nl(3);
+    }
+
+    /* Expenses */
+    var expTxns = D.txns.filter(function(t){return t.type==='expense';}).sort(function(a,b){return b.date.localeCompare(a.date);});
+    if(expTxns.length){
+      hdr('WHERE MONEY WAS SPENT', 200,60,60);
+      expTxns.forEach(function(t){
+        var d=new Date(t.date+'T12:00:00');
+        row(d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear()+'  '+t.desc.substring(0,30)+'  ['+t.cat+']',
+            '-Rs '+t.amt.toLocaleString('en-IN'), [200,60,60]);
+      });
+    }
+
+  } else {
+    /* ── ATTENDANCE PDF ── */
+    pdf.setFillColor(60,80,180); pdf.rect(0,0,W,42,'F');
+    pdf.setFillColor(40,55,150); pdf.rect(0,34,W,8,'F');
+    pdf.setTextColor(255,255,255);
+    pdf.setFontSize(20); pdf.setFont('helvetica','bold');
+    pdf.text('Attendance Report', W/2, 15, {align:'center'});
+    pdf.setFontSize(10); pdf.setFont('helvetica','normal');
+    pdf.text('Student Tracker  |  '+(D.name||'Student'), W/2, 24, {align:'center'});
+    pdf.setFontSize(8);
+    pdf.text('Generated: '+ds, W/2, 38, {align:'center'});
+    y=50; pdf.setTextColor(30,30,30);
+
+    /* Overall */
+    var totC=0,totA=0;
+    D.subjects.forEach(function(s){
+      var c=s.records.filter(function(r){return r.status!=='holiday';});
+      totC+=c.length; totA+=c.filter(function(r){return r.status==='present';}).length;
+    });
+    var overall = totC?Math.round(totA/totC*100):0;
+    var safe = D.subjects.filter(function(s){
+      var c=s.records.filter(function(r){return r.status!=='holiday';});
+      var a=c.filter(function(r){return r.status==='present';}).length;
+      return c.length&&Math.round(a/c.length*100)>=75;
+    }).length;
+
+    hdr('SUMMARY', 60,80,180);
+    row('Overall Attendance', overall+'%', overall>=75?[61,150,80]:[200,60,60]);
+    row('Total Subjects', D.subjects.length);
+    row('Safe (>=75%)', safe, [61,150,80]);
+    row('Risky (<75%)', D.subjects.length-safe, [200,60,60]);
+    nl(3);
+
+    /* Per subject */
+    hdr('SUBJECT BREAKDOWN', 60,80,180);
+    D.subjects.forEach(function(s){
+      var c=s.records.filter(function(r){return r.status!=='holiday';});
+      var a=c.filter(function(r){return r.status==='present';}).length;
+      var ab=c.filter(function(r){return r.status==='absent';}).length;
+      var ho=s.records.filter(function(r){return r.status==='holiday';}).length;
+      var pct=c.length?Math.round(a/c.length*100):0;
+      var col=pct>=75?[61,150,80]:pct>=60?[180,140,40]:[200,60,60];
+      subhdr(s.name+' — '+pct+'%');
+      row('Present', a, [61,150,80]);
+      row('Absent', ab, [200,60,60]);
+      row('Holiday', ho, [180,140,40]);
+      row('Total Classes', c.length);
+      if(pct<75&&c.length>0){
+        var need=Math.ceil((75*c.length-100*a)/(100-75));
+        row('Classes needed for 75%', need, [200,60,60]);
+      }
+      nl(2);
+    });
+  }
+
+  /* Footer */
+  var pages = pdf.internal.getNumberOfPages();
+  for(var i=1;i<=pages;i++){
+    pdf.setPage(i);
+    pdf.setFontSize(7); pdf.setTextColor(160,160,160);
+    pdf.text('Student Tracker  |  '+(D.name||'Student')+'  |  Page '+i+' of '+pages, W/2, 290, {align:'center'});
+  }
+
+  /* Get data URI and show as tappable link in overlay */
+  var dataUri = pdf.output('datauristring');
+  var fname   = (name||'report').replace(/[^a-zA-Z0-9_-]/g,'_')+'.pdf';
+
+  /* Show download link INSIDE the overlay */
+  var dlDiv = document.getElementById('RPT_DL_AREA');
+  if(!dlDiv){
+    dlDiv = document.createElement('div');
+    dlDiv.id = 'RPT_DL_AREA';
+    dlDiv.style.cssText = 'padding:14px;text-align:center;';
+    var bar = document.getElementById('RPT_OV_BAR');
+    if(bar && bar.nextSibling){
+      bar.parentNode.insertBefore(dlDiv, bar.nextSibling);
+    }
+  }
+  /* Try blob URL first (better for WebView apps), fallback to data URI */
+  var dlUrl = dataUri;
+  try {
+    var pdfBlob = pdf.output('blob');
+    var blobUrl = URL.createObjectURL(pdfBlob);
+    dlUrl = blobUrl;
+  } catch(e) { dlUrl = dataUri; }
+
+  dlDiv.innerHTML = '<a href="'+dlUrl+'" download="'+fname+'" '
+    + 'style="display:block;background:linear-gradient(135deg,#ff7b5c,#ff4500);'
+    + 'color:#fff;padding:16px 28px;border-radius:12px;font-size:1.1rem;'
+    + 'font-weight:800;text-decoration:none;font-family:sans-serif;'
+    + 'text-align:center;-webkit-tap-highlight-color:transparent;'
+    + 'box-shadow:0 4px 15px rgba(255,100,50,.4);margin:4px">'
+    + '&#11015;&nbsp; TAP TO SAVE PDF</a>'
+    + '<a href="'+dataUri+'" download="'+fname+'" '
+    + 'style="display:block;background:rgba(61,214,140,.15);'
+    + 'color:#3dd68c;border:1px solid #3dd68c;padding:12px 28px;border-radius:12px;'
+    + 'font-size:.9rem;font-weight:700;text-decoration:none;font-family:sans-serif;'
+    + 'text-align:center;-webkit-tap-highlight-color:transparent;margin:4px">'
+    + '&#11015;&nbsp; Alternative Save Link</a>'
+    + '<div style="font-size:.75rem;color:#888;margin-top:10px;font-family:sans-serif;line-height:1.5">'
+    + 'Tap the orange button to save PDF to Downloads<br>'
+    + 'If it does not work, try the green button</div>';
+
+  showToast('PDF ready — tap the orange button!');
+
+  /* Try Android WebView native download if available */
+  try {
+    if(typeof Android !== 'undefined' && Android.saveFile){
+      Android.saveFile(fname, 'application/pdf', pdf.output('datauristring').split(',')[1]);
+      showToast('Saved to Downloads!');
+    }
+  } catch(e) {}
+}
+
+
+
+function closePDFOv(){ closeReport(); }
+function sharePDF(){ printReport(); }
+
+/* ─── EXPENSES REPORT ─── */
+function dlReport(){
+  var fromDate='', toDate=getToday();
+  var activeBtn=document.querySelector('#rpt7.on,#rpt30.on,#rpt90.on,#rptCustom.on');
+  var rangeId=activeBtn?activeBtn.id:'rpt7';
+  var rangeLabel='';
+  if(rangeId==='rptCustom'){
+    fromDate=ge('RPT_FROM').value||getToday();
+    toDate=ge('RPT_TO').value||getToday();
+    if(!fromDate||!toDate){showToast('Please select date range');return;}
+    rangeLabel=fmtDate(fromDate)+' to '+fmtDate(toDate);
+  } else {
+    var days={'rpt7':7,'rpt30':30,'rpt90':90}[rangeId]||7;
+    var fd=new Date();fd.setDate(fd.getDate()-days);
+    fromDate=[fd.getFullYear(),String(fd.getMonth()+1).padStart(2,'0'),String(fd.getDate()).padStart(2,'0')].join('-');
+    rangeLabel=days===7?'Last 7 Days':days===30?'Last 1 Month':'Last 3 Months';
+  }
+  var name=D.name||'Student';
+  var now=new Date();
+  var dateStr=now.getDate()+'/'+(now.getMonth()+1)+'/'+now.getFullYear();
+  var txns=D.txns.filter(function(t){return t.date>=fromDate&&t.date<=toDate;});
+  var income=txns.filter(function(t){return t.type==='income';});
+  var expenses=txns.filter(function(t){return t.type==='expense';});
+  var totalInc=income.reduce(function(a,t){return a+t.amt;},0);
+  var totalExp=expenses.reduce(function(a,t){return a+t.amt;},0);
+  var balance=totalInc-totalExp;
+  var cats={};
+  expenses.forEach(function(t){cats[t.cat]=(cats[t.cat]||0)+t.amt;});
+
+  var html='<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:16px;background:#fff;color:#1a1a2e">';
+  // Header
+  html+='<div style="background:linear-gradient(135deg,#ff7b5c,#ff4500);color:#fff;border-radius:14px;padding:20px;margin-bottom:16px;text-align:center">';
+  html+='<div style="font-size:1.6rem;font-weight:900;margin-bottom:4px">💰 Expenses Report</div>';
+  html+='<div style="font-size:.9rem;opacity:.9">'+es(name)+' &nbsp;|&nbsp; '+dateStr+'</div>';
+  html+='<div style="font-size:.85rem;opacity:.85;margin-top:4px">📅 '+rangeLabel+'</div>';
+  html+='</div>';
+  // Summary cards
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
+  html+='<div style="background:#e8fdf3;border:2px solid #3dd68c;border-radius:12px;padding:14px;text-align:center"><div style="font-size:1.3rem;font-weight:900;color:#1a7a4a">₹'+totalInc.toLocaleString('en-IN')+'</div><div style="font-size:.75rem;color:#555;margin-top:4px;font-weight:600">TOTAL INCOME</div></div>';
+  html+='<div style="background:#fff0ee;border:2px solid #ff7b5c;border-radius:12px;padding:14px;text-align:center"><div style="font-size:1.3rem;font-weight:900;color:#c0392b">₹'+totalExp.toLocaleString('en-IN')+'</div><div style="font-size:.75rem;color:#555;margin-top:4px;font-weight:600">TOTAL SPENT</div></div>';
+  html+='<div style="background:'+(balance>=0?'#e8fdf3':'#fff0ee')+';border:2px solid '+(balance>=0?'#3dd68c':'#ff7b5c')+';border-radius:12px;padding:14px;text-align:center;grid-column:span 2"><div style="font-size:1.4rem;font-weight:900;color:'+(balance>=0?'#1a7a4a':'#c0392b')+'">₹'+Math.abs(balance).toLocaleString('en-IN')+'</div><div style="font-size:.75rem;color:#555;margin-top:4px;font-weight:600">'+(balance>=0?'BALANCE REMAINING':'OVERSPENT')+'</div></div>';
+  html+='</div>';
+  // Category breakdown
+  if(Object.keys(cats).length){
+    html+='<div style="background:#fff8f0;border:2px solid #ff9a6c;border-radius:12px;padding:14px;margin-bottom:16px">';
+    html+='<div style="font-weight:800;color:#c0392b;margin-bottom:10px;font-size:.95rem">📊 Expenses by Category</div>';
+    var catList=Object.entries(cats).sort(function(a,b){return b[1]-a[1];});
+    catList.forEach(function(e){
+      var pct=totalExp>0?Math.round(e[1]/totalExp*100):0;
+      html+='<div style="margin-bottom:8px">';
+      html+='<div style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:600;margin-bottom:3px"><span>'+es(e[0])+'</span><span style="color:#c0392b">₹'+e[1].toLocaleString('en-IN')+' ('+pct+'%)</span></div>';
+      html+='<div style="background:#f0d0c0;border-radius:99px;height:7px"><div style="background:#ff7b5c;width:'+pct+'%;height:7px;border-radius:99px"></div></div>';
+      html+='</div>';
+    });
+    html+='</div>';
+  }
+  // ── INCOME TRANSACTIONS ──
+  if(income.length){
+    html+='<div style="background:#f0fdf6;border:2px solid #86efac;border-radius:14px;padding:16px;margin-bottom:16px">';
+    html+='<div style="font-weight:900;color:#166534;margin-bottom:12px;font-size:1rem">💵 Income ('+income.length+' entries)</div>';
+    var incSorted=income.slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+    incSorted.forEach(function(t){
+      html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #bbf7d0">';
+      html+='<div style="width:38px;height:38px;background:#dcfce7;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">💰</div>';
+      html+='<div style="flex:1;min-width:0">';
+      html+='<div style="font-size:.88rem;font-weight:800;color:#14532d;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+es(t.desc)+'</div>';
+      html+='<div style="font-size:.72rem;color:#4ade80;font-weight:600;margin-top:2px">'+fmtDate(t.date)+(t.cat?' &nbsp;·&nbsp; '+es(t.cat):'')+'</div>';
+      html+='</div>';
+      html+='<div style="font-weight:900;color:#16a34a;font-size:1rem;flex-shrink:0">+₹'+t.amt.toLocaleString('en-IN')+'</div>';
+      html+='</div>';
+    });
+    html+='</div>';
+  }
+
+  // ── EXPENSE TRANSACTIONS (with where money was spent) ──
+  if(expenses.length){
+    html+='<div style="background:#fff5f5;border:2px solid #fca5a5;border-radius:14px;padding:16px;margin-bottom:16px">';
+    html+='<div style="font-weight:900;color:#7f1d1d;margin-bottom:12px;font-size:1rem">💸 Where Money Was Spent ('+expenses.length+' entries)</div>';
+    var expSorted=expenses.slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+    expSorted.forEach(function(t){
+      var catIcons={'🍕 Food':'🍕','📚 Books':'📚','🚌 Transport':'🚌','🎮 Fun':'🎮','👕 Clothes':'👕','💊 Health':'💊','🏠 Rent':'🏠','💰 Allowance':'💰','📦 Other':'📦'};
+      var icon=catIcons[t.cat]||'💸';
+      html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #fecaca">';
+      html+='<div style="width:38px;height:38px;background:#fee2e2;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">'+icon+'</div>';
+      html+='<div style="flex:1;min-width:0">';
+      html+='<div style="font-size:.88rem;font-weight:800;color:#7f1d1d;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+es(t.desc)+'</div>';
+      html+='<div style="display:flex;gap:6px;margin-top:3px;flex-wrap:wrap">';
+      html+='<span style="background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;padding:2px 8px;border-radius:99px;font-size:.68rem;font-weight:700">'+es(t.cat||'Other')+'</span>';
+      html+='<span style="color:#999;font-size:.7rem;font-weight:500">'+fmtDate(t.date)+'</span>';
+      html+='</div>';
+      html+='</div>';
+      html+='<div style="font-weight:900;color:#dc2626;font-size:1rem;flex-shrink:0">-₹'+t.amt.toLocaleString('en-IN')+'</div>';
+      html+='</div>';
+    });
+    html+='</div>';
+  }
+
+  if(!txns.length){
+    html+='<div style="text-align:center;padding:24px;color:#aaa;font-size:.85rem;background:#f9f9f9;border-radius:12px;margin-bottom:16px">No transactions in this period.</div>';
+  }
+  // Footer
+  html+='<div style="text-align:center;color:#bbb;font-size:.72rem;padding:10px">Student Tracker · '+es(name)+'</div>';
+  html+='</div>';
+
+  var filename='Expenses_'+rangeLabel.replace(/[^a-zA-Z0-9]/g,'_')+'_'+dateStr.replace(/\//g,'-');
+  if(!D.savedReports){D.savedReports=[];}
+  D.savedReports.push({name:filename,type:'💰 Expenses',range:rangeLabel,date:dateStr,data:html});
+  if(D.savedReports.length>10){D.savedReports=D.savedReports.slice(-10);}
+  saveD();
+  renderSavedReports();
+  androidDownload(html, filename);
+  showToast('✓ Report ready!');
+}
+
+
+/* ─── ATTENDANCE REPORT ─── */
+function dlAttReport(){
+  var fromDate='', toDate=getToday();
+  var activeBtn=document.querySelector('#arpt7.on,#arpt30.on,#arpt90.on,#arptCustom.on');
+  var rangeId=activeBtn?activeBtn.id:'arpt7';
+  var rangeLabel='';
+  if(rangeId==='arptCustom'){
+    fromDate=ge('ATT_RPT_FROM').value||getToday();
+    toDate=ge('ATT_RPT_TO').value||getToday();
+    if(!fromDate||!toDate){showToast('Please select date range');return;}
+    rangeLabel=fmtDate(fromDate)+' to '+fmtDate(toDate);
+  } else {
+    var days={'arpt7':7,'arpt30':30,'arpt90':90}[rangeId]||7;
+    var fd=new Date();fd.setDate(fd.getDate()-days);
+    fromDate=[fd.getFullYear(),String(fd.getMonth()+1).padStart(2,'0'),String(fd.getDate()).padStart(2,'0')].join('-');
+    rangeLabel=days===7?'Last 7 Days':days===30?'Last 1 Month':'Last 3 Months';
+  }
+  if(!D.subjects.length){showToast('No subjects added yet!');return;}
+  var name=D.name||'Student';
+  var now=new Date();
+  var dateStr=now.getDate()+'/'+(now.getMonth()+1)+'/'+now.getFullYear();
+  var subs=D.subjects;
+  var totC=0,totA=0,safe=0,risky=0;
+  var subStats=subs.map(function(s){
+    var allRecs=s.records.filter(function(r){return r.date>=fromDate&&r.date<=toDate;});
+    var classRecs=allRecs.filter(function(r){return r.status!=='holiday';});
+    var att=classRecs.filter(function(r){return r.status==='present';}).length;
+    var abs=classRecs.filter(function(r){return r.status==='absent';}).length;
+    var hol=allRecs.filter(function(r){return r.status==='holiday';}).length;
+    var pct=classRecs.length?Math.round(att/classRecs.length*100):null;
+    totC+=classRecs.length; totA+=att;
+    if(pct!==null){if(pct>=75)safe++;else risky++;}
+    return {name:s.name,att:att,abs:abs,hol:hol,total:classRecs.length,pct:pct};
+  });
+  var overallPct=totC?Math.round(totA/totC*100):0;
+  var overallCol=overallPct>=75?'#1a7a4a':overallPct>=60?'#b8860b':'#c0392b';
+  var overallBg=overallPct>=75?'#e8fdf3':overallPct>=60?'#fffbea':'#fff0ee';
+  var overallBorder=overallPct>=75?'#3dd68c':overallPct>=60?'#ffd166':'#ff7b5c';
+
+  var html='<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:16px;background:#fff;color:#1a1a2e">';
+  // Header
+  html+='<div style="background:linear-gradient(135deg,#3c50b4,#1a237e);color:#fff;border-radius:14px;padding:20px;margin-bottom:16px;text-align:center">';
+  html+='<div style="font-size:1.6rem;font-weight:900;margin-bottom:4px">📊 Attendance Report</div>';
+  html+='<div style="font-size:.9rem;opacity:.9">'+es(name)+' &nbsp;|&nbsp; '+dateStr+'</div>';
+  html+='<div style="font-size:.85rem;opacity:.85;margin-top:4px">📅 '+rangeLabel+'</div>';
+  html+='</div>';
+  // Summary cards
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
+  html+='<div style="background:'+overallBg+';border:2px solid '+overallBorder+';border-radius:12px;padding:14px;text-align:center;grid-column:span 2"><div style="font-size:1.8rem;font-weight:900;color:'+overallCol+'">'+overallPct+'%</div><div style="font-size:.75rem;color:#555;margin-top:4px;font-weight:600">OVERALL ATTENDANCE</div>';
+  // Overall bar
+  html+='<div style="background:#e0e0f0;border-radius:99px;height:10px;margin-top:8px"><div style="background:'+overallBorder+';width:'+overallPct+'%;height:10px;border-radius:99px;transition:width .4s"></div></div></div>';
+  html+='<div style="background:#e8fdf3;border:2px solid #3dd68c;border-radius:12px;padding:14px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:#1a7a4a">'+safe+'</div><div style="font-size:.75rem;color:#555;margin-top:4px;font-weight:600">SAFE ≥75%</div></div>';
+  html+='<div style="background:#fff0ee;border:2px solid #ff7b5c;border-radius:12px;padding:14px;text-align:center"><div style="font-size:1.4rem;font-weight:900;color:#c0392b">'+risky+'</div><div style="font-size:.75rem;color:#555;margin-top:4px;font-weight:600">RISKY &lt;75%</div></div>';
+  html+='</div>';
+  // Subject breakdown
+  html+='<div style="background:#f0f4ff;border:2px solid #b0bcee;border-radius:12px;padding:14px;margin-bottom:16px">';
+  html+='<div style="font-weight:800;color:#1a237e;margin-bottom:12px;font-size:.95rem">📚 Subject-wise Breakdown</div>';
+  subStats.forEach(function(s){
+    var col=s.pct===null?'#888':s.pct>=75?'#1a7a4a':s.pct>=60?'#b8860b':'#c0392b';
+    var bg=s.pct===null?'#f0f0f0':s.pct>=75?'#e8fdf3':s.pct>=60?'#fffbea':'#fff0ee';
+    var bar=s.pct===null?'#ccc':s.pct>=75?'#3dd68c':s.pct>=60?'#ffd166':'#ff7b5c';
+    var pctLabel=s.pct===null?'No data':s.pct+'%';
+    html+='<div style="background:'+bg+';border-radius:10px;padding:12px;margin-bottom:10px">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+    html+='<div style="font-weight:800;font-size:.9rem;color:#1a1a2e">'+es(s.name)+'</div>';
+    html+='<div style="font-weight:900;font-size:1.1rem;color:'+col+'">'+pctLabel+'</div>';
+    html+='</div>';
+    if(s.pct!==null){
+      html+='<div style="background:#e0e0f0;border-radius:99px;height:8px;margin-bottom:8px"><div style="background:'+bar+';width:'+s.pct+'%;height:8px;border-radius:99px"></div></div>';
+    }
+    html+='<div style="display:flex;gap:8px;flex-wrap:wrap">';
+    html+='<span style="background:#d4f5e2;color:#1a7a4a;padding:3px 10px;border-radius:99px;font-size:.75rem;font-weight:700">✓ Present: '+s.att+'</span>';
+    html+='<span style="background:#ffe0db;color:#c0392b;padding:3px 10px;border-radius:99px;font-size:.75rem;font-weight:700">✗ Absent: '+s.abs+'</span>';
+    html+='<span style="background:#fff8d6;color:#b8860b;padding:3px 10px;border-radius:99px;font-size:.75rem;font-weight:700">🏖 Holiday: '+s.hol+'</span>';
+    html+='<span style="background:#eee;color:#555;padding:3px 10px;border-radius:99px;font-size:.75rem;font-weight:700">Total: '+s.total+'</span>';
+    if(s.pct!==null&&s.pct<75&&s.total>0){
+      var need=Math.ceil((75*s.total-100*s.att)/(100-75));
+      html+='<span style="background:#ffe0db;color:#c0392b;padding:3px 10px;border-radius:99px;font-size:.75rem;font-weight:700">⚠ Need '+need+' more</span>';
+    }
+    html+='</div></div>';
+  });
+  html+='</div>';
+  // Footer
+  html+='<div style="text-align:center;color:#bbb;font-size:.72rem;padding:10px">Student Tracker · '+es(name)+'</div>';
+  html+='</div>';
+
+  var filename='Attendance_'+rangeLabel.replace(/[^a-zA-Z0-9]/g,'_')+'_'+dateStr.replace(/\//g,'-');
+  if(!D.savedReports){D.savedReports=[];}
+  D.savedReports.push({name:filename,type:'📊 Attendance',range:rangeLabel,date:dateStr,data:html});
+  if(D.savedReports.length>10){D.savedReports=D.savedReports.slice(-10);}
+  saveD();
+  renderSavedReports();
+  androidDownload(html, filename);
+  showToast('✓ Attendance Report ready!');
+}
+
+
+
+/* ═══ BACK BUTTON — catches Android back, never exits app ═══ */
+window.addEventListener('popstate', function(e){
+  if(_reportOpen){
+    closeReport();
+    history.pushState({app:true},'',window.location.href);
+    return;
+  }
+  if(currentPage !== 'dashboard'){
+    go('dashboard');
+  }
+  history.pushState({app:true},'',window.location.href);
+});
+history.pushState({app:true},'',window.location.href);
+
+/* ─── BOOT ─── */
+function renderSavedReports(){
+  if(!D.savedReports){D.savedReports=[];}
+  var el=ge('SAVED_REPORTS'); if(!el){return;}
+  if(!D.savedReports.length){
+    el.innerHTML='<div style="text-align:center;padding:18px;color:var(--mu)"><div style="font-size:2rem;margin-bottom:8px">📄</div><div style="font-size:.8rem;font-weight:500">No reports yet.<br>Generate one below and it will appear here.</div></div>';
+    return;
+  }
+  var h='';
+  D.savedReports.slice().reverse().forEach(function(r,i){
+    var realIdx=D.savedReports.length-1-i;
+    var hasData=!!r.data;
+    h+='<div style="background:var(--c2);border:1px solid var(--bdr);border-radius:9px;padding:11px 13px;margin-bottom:8px;display:flex;align-items:center;gap:10px">';
+    h+='<div style="font-size:1.4rem;flex-shrink:0">📄</div>';
+    h+='<div style="flex:1;min-width:0">';
+    h+='<div style="font-weight:700;font-size:.84rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+es(r.name)+'</div>';
+    h+='<div style="font-size:.67rem;color:var(--mu);margin-top:2px">'+r.type+' · '+r.range+' · '+r.date+'</div>';
+    h+='</div>';
+    h+='<button class="btn bg sm rpt-dl-btn" data-idx="'+realIdx+'" style="font-size:.72rem;flex-shrink:0">'+(hasData?'⬇ Open':'↻ Regen')+'</button>';
+    h+='<button class="ib rpt-del-btn" data-idx="'+realIdx+'" title="Remove">✕</button>';
+    h+='</div>';
+  });
+  el.innerHTML=h;
+  el.querySelectorAll('.rpt-dl-btn').forEach(function(b){
+    b.addEventListener('click',function(){
+      var r=D.savedReports[parseInt(b.dataset.idx)];
+      if(!r){return;}
+      if(!r.data){
+        /* Scroll to generate section */
+        var btn=ge('btnDlReport')||ge('btnDlAttReport');
+        if(btn){btn.scrollIntoView({behavior:'smooth'});}
+        showToast('Generate a new report below');
+        return;
+      }
+      androidDownload(r.data, r.name);
+    });
+  });
+  el.querySelectorAll('.rpt-del-btn').forEach(function(b){
+    b.addEventListener('click',function(){
+      D.savedReports.splice(parseInt(b.dataset.idx),1);
+      saveD(); renderSavedReports();
+    });
+  });
+}
+
+function bootRender(){rDash();renderAtt();renderExp();renderTodo();renderPlan();}
+
+/* Wire PDF overlay buttons immediately at page load */
+(function(){
+})();
+
+if(D.name){
+  ge('WEL').style.display='none';
+  ge('APP').style.display='block';
+  initAll();
+} else {
+  ge('WNAME').focus();
+}
+
+/* ── PWA Service Worker Registration ── */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(){ console.log('SW registered'); })
+      .catch(function(e){ console.log('SW failed', e); });
+  });
+}
+</script>
+
+
+
+<!-- REPORT OVERLAY -->
+<div id="RPT_OV">
+  <div id="RPT_OV_BAR">
+    <button class="rpt-cls" onclick="closeReport()">&#x2715; Close</button>
+    <div id="RPT_OV_TITLE">Report</div>
+    <button class="rpt-print" onclick="this.textContent='Generating...';printReport();setTimeout(function(){this.textContent='⬇ Save PDF';}.bind(this),4000)">⬇ Save PDF</button>
+  </div>
+  <div id="RPT_PRINT_BTN_ROW">
+    <span>&#128161; Tap <b>&#11015; Save PDF</b> above to save the report directly to your phone</span>
+    <button class="rpt-print" onclick="printReport()" style="font-size:.78rem;padding:8px 12px">&#11015; Save PDF</button>
+  </div>
+  <div id="RPT_OV_BODY"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</body>
+</html>
